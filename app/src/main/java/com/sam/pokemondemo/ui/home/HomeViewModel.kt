@@ -4,17 +4,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sam.pokemondemo.R
 import com.sam.pokemondemo.model.DisplayTypeWithPokemons
+import com.sam.pokemondemo.source.repo.SharedPreferenceRepository
 import com.sam.pokemondemo.source.usecase.GetTypeWithPokemonsUseCase
 import com.sam.pokemondemo.source.usecase.UpdatePokemonsFromRemoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val spRepository: SharedPreferenceRepository,
     private val updatePokemonsFromRemote: UpdatePokemonsFromRemoteUseCase,
     private val getTypeWithPokemons: GetTypeWithPokemonsUseCase,
 ) : ViewModel() {
@@ -27,14 +33,26 @@ class HomeViewModel @Inject constructor(
     private val _typeWithPokemons = MutableStateFlow<List<DisplayTypeWithPokemons>>(emptyList())
     val typeWithPokemons = _typeWithPokemons.asStateFlow()
 
+    private val isForceTriggeredUpdate = MutableSharedFlow<Unit>()
+
     init {
         collectUpdatePokemonsState()
         collectTypeWithPokemons()
+
+        // 第一次進來 or 第一次未完成
+        if (!spRepository.isEverLoad || !spRepository.isFirstTimeLoadFinished) {
+            spRepository.isFirstTimeLoadFinished = false
+            updatePokemonsFromRemote()
+        }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun collectUpdatePokemonsState() {
         viewModelScope.launch {
-            updatePokemonsFromRemote.invoke()
+            isForceTriggeredUpdate
+                .flatMapLatest {
+                    updatePokemonsFromRemote.invoke(spRepository.isFirstTimeLoadFinished)
+                }
                 .collectLatest { state ->
                     when {
                         state.isLoading() -> {
@@ -47,6 +65,7 @@ class HomeViewModel @Inject constructor(
                         }
 
                         state.isSuccess() -> {
+                            spRepository.isFirstTimeLoadFinished = true
                             _isLoading.tryEmit(false)
                         }
                     }
@@ -62,4 +81,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun updatePokemonsFromRemote() {
+        if (isLoading.value) return
+        viewModelScope.launch(Dispatchers.IO) {
+            isForceTriggeredUpdate.emit(Unit)
+        }
+    }
 }

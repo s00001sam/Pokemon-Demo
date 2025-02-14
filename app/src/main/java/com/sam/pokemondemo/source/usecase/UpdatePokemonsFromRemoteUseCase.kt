@@ -21,11 +21,24 @@ import javax.inject.Inject
 class UpdatePokemonsFromRemoteUseCase @Inject constructor(
     private val repo: BaseRepository,
 ) {
-    fun invoke(): Flow<State<Any>> = flow {
+    /**
+     * @param isFirstTimeLoadFinished 第一次載入是否完成，如果未完成，則繼續
+     */
+    fun invoke(
+        isFirstTimeLoadFinished: Boolean,
+    ): Flow<State<Any>> = flow {
         runCatching {
             val remoteBasicResults = withContext(Dispatchers.IO) {
                 val response = repo.getRemoteBasicPokemons(DEFAULT_GET_POKEMONS_URL)
                 response.body()?.results.orEmpty()
+            }
+
+            /**
+             * 第一次載入未完成，需要知道已經載入了哪些
+             */
+            val firstTimeLoadedNames: List<String> = when (isFirstTimeLoadFinished) {
+                true -> emptyList()
+                false -> repo.getLocalPokemonNames()
             }
 
             remoteBasicResults.chunked(BATCH_SIZE).forEach { batchResults ->
@@ -33,7 +46,8 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
                     batchResults.map { result ->
                         async(Dispatchers.IO) {
                             runCatching {
-                                if (result.url == null) return@async null
+                                if (result.url == null || result.name == null) return@async null
+                                if (firstTimeLoadedNames.contains(result.name)) return@async null
 
                                 repo.getRemotePokemon(url = result.url).body()
                             }

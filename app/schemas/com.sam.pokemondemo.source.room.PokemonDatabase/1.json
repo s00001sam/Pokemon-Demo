@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "23d9f66b7ff11b8756ffbde04b8c40eb",
+    "identityHash": "fd38d3fe034d5abc35439b8dfd406d06",
     "entities": [
       {
         "tableName": "pokemon",
@@ -96,12 +96,49 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "capture",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pokemonId` INTEGER NOT NULL, `capturedTime` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pokemonId",
+            "columnName": "pokemonId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "capturedTime",
+            "columnName": "capturedTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
-    "views": [],
+    "views": [
+      {
+        "viewName": "capture_pokemon_view",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT c.id, p.id AS pokemonId, p.name, p.imageUrl, c.capturedTime\n             FROM capture c \n             INNER JOIN pokemon p ON p.id = c.pokemonId"
+      }
+    ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '23d9f66b7ff11b8756ffbde04b8c40eb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fd38d3fe034d5abc35439b8dfd406d06')"
     ]
   }
 }
