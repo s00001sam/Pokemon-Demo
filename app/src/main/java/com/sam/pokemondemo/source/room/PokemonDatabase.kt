@@ -11,6 +11,7 @@ import com.sam.pokemondemo.source.room.dao.RefDao
 import com.sam.pokemondemo.source.room.dao.TypeDao
 import com.sam.pokemondemo.source.room.entity.CaptureEntity
 import com.sam.pokemondemo.source.room.entity.CapturedPokemonView
+import com.sam.pokemondemo.source.room.entity.DetailPokemonView
 import com.sam.pokemondemo.source.room.entity.PokemonEntity
 import com.sam.pokemondemo.source.room.entity.TypeEntity
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
@@ -21,7 +22,7 @@ import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
         CaptureEntity::class,
     ],
     views = [
-        CapturedPokemonView::class,
+        CapturedPokemonView::class, DetailPokemonView::class,
     ],
     version = 1,
     exportSchema = true,

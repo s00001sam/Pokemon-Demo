@@ -1,6 +1,7 @@
 package com.sam.pokemondemo.source.repo
 
 import com.sam.pokemondemo.model.BasicPokemonsResponse
+import com.sam.pokemondemo.model.PokemonSpeciesResponse
 import com.sam.pokemondemo.model.RemotePokemonResponse
 import com.sam.pokemondemo.source.datasource.BaseDataSource
 import com.sam.pokemondemo.source.hilt.LocalData
@@ -8,6 +9,8 @@ import com.sam.pokemondemo.source.hilt.RemoteData
 import com.sam.pokemondemo.source.room.entity.BasicPokemonInfos
 import com.sam.pokemondemo.source.room.entity.CaptureEntity
 import com.sam.pokemondemo.source.room.entity.CapturedPokemonView
+import com.sam.pokemondemo.source.room.entity.DetailPokemonWithTypes
+import com.sam.pokemondemo.source.room.entity.PokemonEntity
 import com.sam.pokemondemo.source.room.entity.TypeEntity
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
 import com.sam.pokemondemo.source.room.entity.TypeWithPokemons
@@ -32,7 +35,7 @@ class PokemonRepository @Inject constructor(
     }
 
     override suspend fun getLocalPokemonNames(): List<String> {
-        return localDataSource.getPokemonNames()
+        return localDataSource.getLocalPokemonNames()
     }
 
     override suspend fun upsertBasicPokemonsAndTypes(
@@ -43,8 +46,8 @@ class PokemonRepository @Inject constructor(
         localDataSource.upsertBasicPokemonsAndTypes(basicInfos, refs, types)
     }
 
-    override fun getTypeWithPokemons(): Flow<List<TypeWithPokemons>> {
-        return localDataSource.getTypeWithPokemons()
+    override fun getLocalTypeWithPokemons(): Flow<List<TypeWithPokemons>> {
+        return localDataSource.getLocalTypeWithPokemons()
     }
 
     override suspend fun insertCapture(capture: CaptureEntity) {
@@ -55,7 +58,23 @@ class PokemonRepository @Inject constructor(
         localDataSource.deleteCaptureById(id)
     }
 
-    override fun getCapturedPokemons(): Flow<List<CapturedPokemonView>> {
-        return localDataSource.getCapturedPokemons()
+    override fun getLocalCapturedPokemons(): Flow<List<CapturedPokemonView>> {
+        return localDataSource.getLocalCapturedPokemons()
+    }
+
+    override suspend fun getRemotePokemonSpecies(id: Int): Response<PokemonSpeciesResponse> {
+        return remoteDataSource.getRemotePokemonSpecies(id)
+    }
+
+    override suspend fun updateDetails(
+        pokemonEntity: PokemonEntity,
+        refs: List<TypePokemonCrossRef>,
+        types: List<TypeEntity>,
+    ) {
+        localDataSource.updateDetails(pokemonEntity, refs, types)
+    }
+
+    override fun getLocalDetailWithTypes(pokemonId: Int): Flow<DetailPokemonWithTypes> {
+        return localDataSource.getLocalDetailWithTypes(pokemonId)
     }
 }

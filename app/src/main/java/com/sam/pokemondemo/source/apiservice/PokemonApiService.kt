@@ -1,6 +1,7 @@
 package com.sam.pokemondemo.source.apiservice
 
 import com.sam.pokemondemo.model.BasicPokemonsResponse
+import com.sam.pokemondemo.model.PokemonSpeciesResponse
 import com.sam.pokemondemo.model.RemotePokemonResponse
 import retrofit2.Response
 import retrofit2.http.GET
@@ -27,6 +28,11 @@ interface PokemonApiService {
     suspend fun getPokemon(
         @Path("id") id: Int
     ): Response<RemotePokemonResponse>
+
+    @GET("pokemon-species/{id}")
+    suspend fun getPokemonSpecies(
+        @Path("id") id: Int
+    ): Response<PokemonSpeciesResponse>
 
     companion object {
         const val PAGE_COUNT = 151

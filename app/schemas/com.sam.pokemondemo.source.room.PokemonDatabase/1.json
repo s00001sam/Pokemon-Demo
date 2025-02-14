@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fd38d3fe034d5abc35439b8dfd406d06",
+    "identityHash": "8eec2f026e69529231f88c820e75a425",
     "entities": [
       {
         "tableName": "pokemon",
@@ -134,11 +134,15 @@
       {
         "viewName": "capture_pokemon_view",
         "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT c.id, p.id AS pokemonId, p.name, p.imageUrl, c.capturedTime\n             FROM capture c \n             INNER JOIN pokemon p ON p.id = c.pokemonId"
+      },
+      {
+        "viewName": "detail_pokemon_view",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT p.id AS pokemonId, p.name, p.imageUrl, p.description, p.evolvesFromName,\n                COALESCE(evolves.id, -1) AS evolvesFromId,\n                COALESCE(evolves.imageUrl, '') AS evolvesFromImageUrl\n             FROM pokemon p\n             LEFT JOIN pokemon evolves ON p.evolvesFromName = evolves.name\n             LEFT JOIN typePokemonCrossRef ref ON p.id = ref.pokemonId"
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fd38d3fe034d5abc35439b8dfd406d06')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8eec2f026e69529231f88c820e75a425')"
     ]
   }
 }

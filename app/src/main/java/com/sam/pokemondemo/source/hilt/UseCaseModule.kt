@@ -3,8 +3,10 @@ package com.sam.pokemondemo.source.hilt
 import com.sam.pokemondemo.source.repo.BaseRepository
 import com.sam.pokemondemo.source.usecase.DeleteCaptureByIdUseCase
 import com.sam.pokemondemo.source.usecase.GetCapturedPokemonsUseCase
+import com.sam.pokemondemo.source.usecase.GetDetailPokemonUseCase
 import com.sam.pokemondemo.source.usecase.GetTypeWithPokemonsUseCase
 import com.sam.pokemondemo.source.usecase.InsertCaptureUseCase
+import com.sam.pokemondemo.source.usecase.UpdatePokemonDetailFromRemoteUseCase
 import com.sam.pokemondemo.source.usecase.UpdatePokemonsFromRemoteUseCase
 import dagger.Module
 import dagger.Provides
@@ -39,4 +41,13 @@ class UseCaseModule {
         repository: BaseRepository,
     ) = DeleteCaptureByIdUseCase(repository)
 
+    @Provides
+    fun provideUpdatePokemonDetailFromRemoteUseCase(
+        repository: BaseRepository,
+    ) = UpdatePokemonDetailFromRemoteUseCase(repository)
+
+    @Provides
+    fun provideGetDetailPokemonUseCase(
+        repository: BaseRepository,
+    ) = GetDetailPokemonUseCase(repository)
 }

@@ -13,7 +13,7 @@ class GetCapturedPokemonsUseCase @Inject constructor(
     private val repo: BaseRepository,
 ) {
     fun invoke(): Flow<List<CapturedDisplayPokemon>> {
-        return repo.getCapturedPokemons().map {
+        return repo.getLocalCapturedPokemons().map {
             it.map { it.toDisplayPokemon() }
         }
             .flowOn(Dispatchers.IO)

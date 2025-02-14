@@ -13,7 +13,7 @@ class GetTypeWithPokemonsUseCase @Inject constructor(
     private val repo: BaseRepository,
 ) {
     fun invoke(): Flow<List<DisplayTypeWithPokemons>> {
-        return repo.getTypeWithPokemons().map {
+        return repo.getLocalTypeWithPokemons().map {
             it.map { it.toDisplayTypeWithPokemons() }
         }
             .flowOn(Dispatchers.IO)
