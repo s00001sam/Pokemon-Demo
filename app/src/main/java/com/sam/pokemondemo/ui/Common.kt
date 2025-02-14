@@ -2,12 +2,18 @@ package com.sam.pokemondemo.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshDefaults
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
@@ -119,6 +125,36 @@ fun MyTag(
         Text(
             text = tagName,
             style = MaterialTheme.typography.body,
+        )
+    }
+}
+
+/**
+ * 發現 Material 3 PullToRefreshBox 有卡住的問題，這邊先使用 Material 2
+ */
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun MyPullToRefreshBox(
+    modifier: Modifier = Modifier,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    refreshingOffset: Dp = PullRefreshDefaults.RefreshThreshold,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    val refreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = onRefresh,
+        refreshingOffset = refreshingOffset,
+    )
+    Box(
+        modifier = modifier
+            .pullRefresh(refreshState),
+    ) {
+        content()
+        PullRefreshIndicator(
+            modifier = Modifier.align(Alignment.TopCenter),
+            refreshing = isRefreshing,
+            state = refreshState,
         )
     }
 }

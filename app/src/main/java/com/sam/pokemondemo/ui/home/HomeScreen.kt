@@ -27,12 +27,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -54,6 +55,7 @@ import com.sam.pokemondemo.model.DisplayPokemon
 import com.sam.pokemondemo.model.DisplayTypeWithPokemons
 import com.sam.pokemondemo.ui.MyErrorSnackbar
 import com.sam.pokemondemo.ui.MyImage
+import com.sam.pokemondemo.ui.MyPullToRefreshBox
 import com.sam.pokemondemo.ui.theme.body
 import com.sam.pokemondemo.ui.theme.headline1
 
@@ -65,12 +67,23 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
-    val isLoading by viewModel.isLoading.collectAsState(false)
-    val errorMessageRes by viewModel.errorMessageRes.collectAsState(null)
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle(false)
+    val errorMessageRes by viewModel.errorMessageRes.collectAsStateWithLifecycle(null)
+    val capturedPokemonList by viewModel.capturedPokemons.collectAsStateWithLifecycle(emptyList())
+    val typeWithPokemonsList by viewModel.typeWithPokemons.collectAsStateWithLifecycle(emptyList())
+    var isEmptyVisible by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(isLoading) {
+        if (isLoading) isEmptyVisible = false
+    }
 
     LaunchedEffect(errorMessageRes) {
         val res = errorMessageRes ?: return@LaunchedEffect
         snackBarHostState.showSnackbar(context.getString(res))
+        if (typeWithPokemonsList.isEmpty()) {
+            isEmptyVisible = true
+        }
+        viewModel.resetErrorMessage()
     }
 
     Scaffold(
@@ -83,11 +96,7 @@ fun HomeScreen(
             }
         }
     ) { contentPadding ->
-        val capturedPokemonList by viewModel.capturedPokemons.collectAsStateWithLifecycle(emptyList())
-        val typeWithPokemonsList by viewModel.typeWithPokemons.collectAsStateWithLifecycle(emptyList())
-        val isEmptyVisible = errorMessageRes != null && typeWithPokemonsList.isEmpty()
-
-        PullToRefreshBox(
+        MyPullToRefreshBox(
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize(),
@@ -117,7 +126,6 @@ fun HomeScreen(
                     navController.navigate(route = Detail(pokemon.pokemonId))
                 },
                 onRetryClicked = {
-                    viewModel.resetErrorMessage()
                     viewModel.updatePokemonsFromRemote()
                 }
             )

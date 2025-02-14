@@ -15,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,10 +22,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,13 +40,13 @@ import com.sam.pokemondemo.R
 import com.sam.pokemondemo.model.DetailDisplayPokemon
 import com.sam.pokemondemo.ui.MyErrorSnackbar
 import com.sam.pokemondemo.ui.MyImage
+import com.sam.pokemondemo.ui.MyPullToRefreshBox
 import com.sam.pokemondemo.ui.MyTag
 import com.sam.pokemondemo.ui.theme.body
 import com.sam.pokemondemo.ui.theme.headline1
 import com.sam.pokemondemo.ui.theme.headline3
 import com.sam.pokemondemo.ui.theme.title
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     navController: NavController,
@@ -57,7 +54,7 @@ fun DetailScreen(
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
-    val errorMessageRes by viewModel.errorMessageRes.collectAsState(null)
+    val errorMessageRes by viewModel.errorMessageRes.collectAsStateWithLifecycle(null)
 
     LaunchedEffect(errorMessageRes) {
         val res = errorMessageRes ?: return@LaunchedEffect
@@ -74,10 +71,10 @@ fun DetailScreen(
             }
         },
     ) { contentPadding ->
-        val isLoading by viewModel.isLoading.collectAsState(false)
+        val isLoading by viewModel.isLoading.collectAsStateWithLifecycle(false)
         val pokemon by viewModel.pokemon.collectAsStateWithLifecycle(null)
 
-        PullToRefreshBox(
+        MyPullToRefreshBox(
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize(),
