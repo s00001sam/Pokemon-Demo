@@ -14,12 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -60,7 +60,6 @@ import com.sam.pokemondemo.ui.rememberLazyListState
 import com.sam.pokemondemo.ui.theme.body
 import com.sam.pokemondemo.ui.theme.headline1
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -326,8 +325,6 @@ fun HomePokemonLazyRow(
                 )
 
                 HomePokemonItemView(
-                    modifier = Modifier
-                        .width(96.dp),
                     pokemon = pokemons[index],
                     onPokemonClicked = onPokemonClicked,
                     onCaptureClicked = onCaptureClicked,
@@ -352,6 +349,7 @@ fun HomePokemonItemView(
 ) {
     Box(
         modifier = modifier
+            .wrapContentSize()
             .combinedClickable(
                 enabled = isClickable,
                 onClick = {
@@ -366,9 +364,10 @@ fun HomePokemonItemView(
         ) {
             MyImage(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .size(80.dp)
                     .aspectRatio(1f),
                 url = pokemon.imageUrl,
+                size = 80.dp,
                 contentDescription = pokemon.name,
             )
 

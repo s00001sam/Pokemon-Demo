@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -62,11 +63,17 @@ fun LoadingIndicator(
 fun MyImage(
     modifier: Modifier = Modifier,
     url: String,
+    size: Dp,
     contentDescription: String?,
 ) {
+    val sizePx = with(LocalDensity.current) {
+        size.toPx().toInt()
+    }
+
     SubcomposeAsyncImage(
         modifier = modifier,
         model = ImageRequest.Builder(LocalContext.current)
+            .size(sizePx)
             .data(url)
             .build(),
         contentDescription = contentDescription,

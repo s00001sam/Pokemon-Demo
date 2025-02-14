@@ -202,6 +202,7 @@ fun BasicInfoSection(
             modifier = Modifier
                 .size(160.dp),
             url = pokemon.imageUrl,
+            size = 160.dp,
             contentDescription = pokemon.name,
         )
 
@@ -275,6 +276,7 @@ fun EvolveSection(
             modifier = Modifier
                 .size(80.dp),
             url = evolvesFromImageUrl,
+            size = 80.dp,
             contentDescription = evolvesFromName,
         )
     }
