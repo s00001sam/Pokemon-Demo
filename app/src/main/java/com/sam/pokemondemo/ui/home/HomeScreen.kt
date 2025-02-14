@@ -1,6 +1,7 @@
 package com.sam.pokemondemo.ui.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -30,13 +32,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.sam.pokemondemo.R
+import com.sam.pokemondemo.model.BasicDisplayPokemon
+import com.sam.pokemondemo.model.CapturedDisplayPokemon
 import com.sam.pokemondemo.model.DisplayPokemon
 import com.sam.pokemondemo.model.DisplayTypeWithPokemons
 import com.sam.pokemondemo.ui.LoadingIndicator
@@ -70,6 +77,7 @@ fun HomeScreen(
             }
         }
     ) { contentPadding ->
+        val capturedPokemonList by viewModel.capturedPokemons.collectAsState(emptyList())
         val typeWithPokemonsList by viewModel.typeWithPokemons.collectAsState(emptyList())
 
         Box(
@@ -80,11 +88,17 @@ fun HomeScreen(
             HomeContent(
                 modifier = Modifier
                     .fillMaxSize(),
+                capturedPokemons = capturedPokemonList,
                 typeWithPokemonsList = typeWithPokemonsList,
                 onCapturedAdded = { pokemon ->
                     viewModel.addPokemonCaptured(
                         pokemonId = pokemon.pokemonId,
                     )
+                },
+                onCapturedRemoved = { pokemon ->
+                    (pokemon as? CapturedDisplayPokemon)?.captureId?.let { captureId ->
+                        viewModel.removePokemonCaptured(captureId)
+                    }
                 },
                 toDetail = {
                     // TODO: navigation to detail
@@ -99,16 +113,33 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
+    capturedPokemons: List<DisplayPokemon>,
     typeWithPokemonsList: List<DisplayTypeWithPokemons>,
-    toDetail: (DisplayPokemon) -> Unit = {},
     onCapturedAdded: (DisplayPokemon) -> Unit = {},
+    onCapturedRemoved: (DisplayPokemon) -> Unit = {},
+    toDetail: (DisplayPokemon) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier,
     ) {
+        // My Pocket
+        stickyHeader {
+            TypeWithPokemonsItemView(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .fillMaxWidth(),
+                typeName = stringResource(R.string.my_pocket_title),
+                pokemons = capturedPokemons,
+                isBottomLineVisible = true,
+                onPokemonClicked = toDetail,
+                onCaptureClicked = onCapturedRemoved,
+            )
+        }
+
         // All Types and Pokemons
         items(
             count = typeWithPokemonsList.size,
@@ -123,6 +154,7 @@ fun HomeContent(
                     .fillMaxWidth(),
                 typeName = type.name,
                 pokemons = pokemons,
+                isBottomLineVisible = false,
                 onPokemonClicked = toDetail,
                 onCaptureClicked = onCapturedAdded,
             )
@@ -135,9 +167,12 @@ fun TypeWithPokemonsItemView(
     modifier: Modifier = Modifier,
     typeName: String,
     pokemons: List<DisplayPokemon>,
+    isBottomLineVisible: Boolean = false,
     onPokemonClicked: (DisplayPokemon) -> Unit = {},
     onCaptureClicked: (DisplayPokemon) -> Unit = {},
 ) {
+    val isEmpty = pokemons.isEmpty()
+
     Column(
         modifier = modifier,
     ) {
@@ -167,10 +202,36 @@ fun TypeWithPokemonsItemView(
 
         Spacer(Modifier.size(8.dp))
 
-        HomePokemonLazyRow(
-            pokemons = pokemons,
-            onPokemonClicked = onPokemonClicked,
-            onCaptureClicked = onCaptureClicked,
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (isEmpty) HomePokemonItemView(
+                modifier = Modifier
+                    .width(96.dp)
+                    .alpha(0f),
+                pokemon = BasicDisplayPokemon(name = ""),
+                isClickable = false,
+            )
+
+            if (isEmpty) Text(
+                text = stringResource(R.string.my_pocket_empty),
+                style = MaterialTheme.typography.headline1,
+            )
+
+            if (!isEmpty) HomePokemonLazyRow(
+                pokemons = pokemons,
+                onPokemonClicked = onPokemonClicked,
+                onCaptureClicked = onCaptureClicked,
+            )
+        }
+
+        if (isBottomLineVisible) HorizontalDivider(
+            modifier = Modifier
+                .padding(top = 4.dp),
+            thickness = 2.dp,
+            color = Color.Blue,
         )
     }
 }

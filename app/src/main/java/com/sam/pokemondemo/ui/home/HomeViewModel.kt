@@ -49,6 +49,7 @@ class HomeViewModel @Inject constructor(
     init {
         collectUpdatePokemonsState()
         collectTypeWithPokemons()
+        collectCapturedPokemons()
 
         // 第一次進來 or 第一次未完成
         if (!spRepository.isEverLoad || !spRepository.isFirstTimeLoadFinished) {

@@ -2,4 +2,6 @@
     <string name="app_name">PokemonDemo</string>
     <string name="network_error_massage">The network is currently unavailable. Please try again later.</string>
     <string name="image_error">404</string>
+    <string name="my_pocket_title">My Pocket</string>
+    <string name="my_pocket_empty">My Pocket is Empty</string>
 </resources>
