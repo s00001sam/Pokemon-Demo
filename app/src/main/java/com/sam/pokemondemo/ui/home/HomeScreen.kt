@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.sam.pokemondemo.Detail
 import com.sam.pokemondemo.R
 import com.sam.pokemondemo.model.BasicDisplayPokemon
 import com.sam.pokemondemo.model.CapturedDisplayPokemon
@@ -111,8 +112,8 @@ fun HomeScreen(
                         viewModel.removePokemonCaptured(captureId)
                     }
                 },
-                toDetail = {
-                    // TODO: navigation to detail
+                toDetail = { pokemon ->
+                    navController.navigate(route = Detail(pokemon.pokemonId))
                 },
                 onRetryClicked = {
                     viewModel.resetErrorMessage()

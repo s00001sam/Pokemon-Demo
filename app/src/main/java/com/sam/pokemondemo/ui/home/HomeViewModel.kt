@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -72,6 +73,7 @@ class HomeViewModel @Inject constructor(
                         }
 
                         state.isError() -> {
+                            Timber.e(state.getError()?.localizedMessage.toString())
                             _isLoading.tryEmit(false)
                             _errorMessageRes.tryEmit(R.string.network_error_massage)
                         }
