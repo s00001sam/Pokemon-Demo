@@ -8,9 +8,13 @@ import com.sam.pokemondemo.model.DetailDisplayPokemon
 import com.sam.pokemondemo.source.usecase.GetDetailPokemonUseCase
 import com.sam.pokemondemo.source.usecase.UpdatePokemonDetailFromRemoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -32,11 +36,14 @@ class DetailViewModel @Inject constructor(
     private val _pokemon = MutableStateFlow<DetailDisplayPokemon?>(null)
     val pokemon = _pokemon.asStateFlow()
 
+    private val refreshTrigger = MutableSharedFlow<Unit>()
+
     init {
         initId()?.let { id ->
             collectUpdatePokemonDetailState(id)
             collectPokemon(id)
         }
+        refresh()
     }
 
     private fun initId(): Int? {
@@ -54,9 +61,13 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun collectUpdatePokemonDetailState(id: Int) {
         viewModelScope.launch {
-            updatePokemonDetailFromRemote.invoke(id)
+            refreshTrigger
+                .flatMapLatest {
+                    updatePokemonDetailFromRemote.invoke(id)
+                }
                 .collectLatest { state ->
                     when {
                         state.isLoading() -> {
@@ -75,6 +86,17 @@ class DetailViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    fun refresh() {
+        if (isLoading.value) return
+        viewModelScope.launch(Dispatchers.IO) {
+            refreshTrigger.emit(Unit)
+        }
+    }
+
+    fun resetErrorMessage() {
+        _errorMessageRes.tryEmit(null)
     }
 
     companion object {
