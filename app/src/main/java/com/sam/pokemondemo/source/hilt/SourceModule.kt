@@ -1,15 +1,20 @@
 package com.sam.pokemondemo.source.hilt
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import com.sam.pokemondemo.BuildConfig
 import com.sam.pokemondemo.source.apiservice.PokemonApiService
 import com.sam.pokemondemo.source.datasource.BaseDataSource
 import com.sam.pokemondemo.source.datasource.LocalDataSource
 import com.sam.pokemondemo.source.datasource.RemoteDataSource
+import com.sam.pokemondemo.source.room.PokemonDatabase
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -52,8 +57,8 @@ class SourceModule {
     @Singleton
     @LocalData
     @Provides
-    fun providerLocalDataSource(): BaseDataSource {
-        return LocalDataSource()
+    fun providerLocalDataSource(db: PokemonDatabase): BaseDataSource {
+        return LocalDataSource(db)
     }
 
     @Singleton
@@ -63,7 +68,17 @@ class SourceModule {
         return RemoteDataSource(apiService)
     }
 
+    @Singleton
+    @Provides
+    fun provideRoomDB(@ApplicationContext context: Context) = PokemonDatabase.getInstance(context)
+
+    @Provides
+    fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences(NAME_DEFAULT, Context.MODE_PRIVATE)
+    }
+
     companion object {
         private const val BASE_URL = "https://pokeapi.co/api/v2/"
+        private const val NAME_DEFAULT = BuildConfig.APPLICATION_ID
     }
 }
