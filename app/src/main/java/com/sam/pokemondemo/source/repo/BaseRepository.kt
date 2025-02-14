@@ -3,6 +3,8 @@ package com.sam.pokemondemo.source.repo
 import com.sam.pokemondemo.model.BasicPokemonsResponse
 import com.sam.pokemondemo.model.RemotePokemonResponse
 import com.sam.pokemondemo.source.room.entity.BasicPokemonInfos
+import com.sam.pokemondemo.source.room.entity.CaptureEntity
+import com.sam.pokemondemo.source.room.entity.CapturedPokemonView
 import com.sam.pokemondemo.source.room.entity.TypeEntity
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
 import com.sam.pokemondemo.source.room.entity.TypeWithPokemons
@@ -21,4 +23,7 @@ interface BaseRepository {
     )
 
     fun getTypeWithPokemons(): Flow<List<TypeWithPokemons>>
+    suspend fun insertCapture(capture: CaptureEntity)
+    suspend fun deleteCaptureById(id: Int)
+    fun getCapturedPokemons(): Flow<List<CapturedPokemonView>>
 }

@@ -5,6 +5,8 @@ import com.sam.pokemondemo.model.BasicPokemonsResponse
 import com.sam.pokemondemo.model.RemotePokemonResponse
 import com.sam.pokemondemo.source.room.PokemonDatabase
 import com.sam.pokemondemo.source.room.entity.BasicPokemonInfos
+import com.sam.pokemondemo.source.room.entity.CaptureEntity
+import com.sam.pokemondemo.source.room.entity.CapturedPokemonView
 import com.sam.pokemondemo.source.room.entity.TypeEntity
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
 import com.sam.pokemondemo.source.room.entity.TypeWithPokemons
@@ -45,5 +47,17 @@ class LocalDataSource @Inject constructor(
 
     override fun getTypeWithPokemons(): Flow<List<TypeWithPokemons>> {
         return db.typeDao().getTypeWithPokemons()
+    }
+
+    override suspend fun insertCapture(capture: CaptureEntity) {
+        db.captureDao().insertCapture(capture)
+    }
+
+    override suspend fun deleteCaptureById(id: Int) {
+        db.captureDao().deleteCaptureById(id)
+    }
+
+    override fun getCapturedPokemons(): Flow<List<CapturedPokemonView>> {
+        return db.pokemonDao().getCapturedPokemons()
     }
 }

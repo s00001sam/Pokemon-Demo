@@ -4,6 +4,8 @@ import com.sam.pokemondemo.model.BasicPokemonsResponse
 import com.sam.pokemondemo.model.RemotePokemonResponse
 import com.sam.pokemondemo.source.apiservice.PokemonApiService
 import com.sam.pokemondemo.source.room.entity.BasicPokemonInfos
+import com.sam.pokemondemo.source.room.entity.CaptureEntity
+import com.sam.pokemondemo.source.room.entity.CapturedPokemonView
 import com.sam.pokemondemo.source.room.entity.TypeEntity
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
 import com.sam.pokemondemo.source.room.entity.TypeWithPokemons
@@ -39,6 +41,18 @@ class RemoteDataSource @Inject constructor(
     }
 
     override fun getTypeWithPokemons(): Flow<List<TypeWithPokemons>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun insertCapture(capture: CaptureEntity) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteCaptureById(id: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getCapturedPokemons(): Flow<List<CapturedPokemonView>> {
         TODO("Not yet implemented")
     }
 }

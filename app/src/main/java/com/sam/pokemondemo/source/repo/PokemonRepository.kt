@@ -6,6 +6,8 @@ import com.sam.pokemondemo.source.datasource.BaseDataSource
 import com.sam.pokemondemo.source.hilt.LocalData
 import com.sam.pokemondemo.source.hilt.RemoteData
 import com.sam.pokemondemo.source.room.entity.BasicPokemonInfos
+import com.sam.pokemondemo.source.room.entity.CaptureEntity
+import com.sam.pokemondemo.source.room.entity.CapturedPokemonView
 import com.sam.pokemondemo.source.room.entity.TypeEntity
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
 import com.sam.pokemondemo.source.room.entity.TypeWithPokemons
@@ -43,5 +45,17 @@ class PokemonRepository @Inject constructor(
 
     override fun getTypeWithPokemons(): Flow<List<TypeWithPokemons>> {
         return localDataSource.getTypeWithPokemons()
+    }
+
+    override suspend fun insertCapture(capture: CaptureEntity) {
+        localDataSource.insertCapture(capture)
+    }
+
+    override suspend fun deleteCaptureById(id: Int) {
+        localDataSource.deleteCaptureById(id)
+    }
+
+    override fun getCapturedPokemons(): Flow<List<CapturedPokemonView>> {
+        return localDataSource.getCapturedPokemons()
     }
 }

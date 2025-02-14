@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.sam.pokemondemo.model.DisplayPokemon
 import com.sam.pokemondemo.model.DisplayTypeWithPokemons
+import com.sam.pokemondemo.ui.LoadingIndicator
 import com.sam.pokemondemo.ui.MyErrorSnackbar
 import com.sam.pokemondemo.ui.MyImage
 import com.sam.pokemondemo.ui.theme.body
@@ -80,16 +81,30 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxSize(),
                 typeWithPokemonsList = typeWithPokemonsList,
+                onCapturedAdded = { pokemon ->
+                    viewModel.addPokemonCaptured(
+                        pokemonId = pokemon.pokemonId,
+                    )
+                },
+                toDetail = {
+                    // TODO: navigation to detail
+                },
             )
         }
+
+        if (isLoading) LoadingIndicator(
+            modifier = Modifier
+                .fillMaxSize(),
+        )
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
     typeWithPokemonsList: List<DisplayTypeWithPokemons>,
+    toDetail: (DisplayPokemon) -> Unit = {},
+    onCapturedAdded: (DisplayPokemon) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier,
@@ -108,6 +123,8 @@ fun HomeContent(
                     .fillMaxWidth(),
                 typeName = type.name,
                 pokemons = pokemons,
+                onPokemonClicked = toDetail,
+                onCaptureClicked = onCapturedAdded,
             )
         }
     }
@@ -118,6 +135,8 @@ fun TypeWithPokemonsItemView(
     modifier: Modifier = Modifier,
     typeName: String,
     pokemons: List<DisplayPokemon>,
+    onPokemonClicked: (DisplayPokemon) -> Unit = {},
+    onCaptureClicked: (DisplayPokemon) -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -150,6 +169,8 @@ fun TypeWithPokemonsItemView(
 
         HomePokemonLazyRow(
             pokemons = pokemons,
+            onPokemonClicked = onPokemonClicked,
+            onCaptureClicked = onCaptureClicked,
         )
     }
 }
@@ -157,6 +178,8 @@ fun TypeWithPokemonsItemView(
 @Composable
 fun HomePokemonLazyRow(
     pokemons: List<DisplayPokemon>,
+    onPokemonClicked: (DisplayPokemon) -> Unit = {},
+    onCaptureClicked: (DisplayPokemon) -> Unit = {},
 ) {
     LazyRow(
         modifier = Modifier
@@ -174,6 +197,8 @@ fun HomePokemonLazyRow(
                     modifier = Modifier
                         .width(96.dp),
                     pokemon = pokemons[index],
+                    onPokemonClicked = onPokemonClicked,
+                    onCaptureClicked = onCaptureClicked,
                 )
 
                 if (index == pokemons.size - 1) Spacer(

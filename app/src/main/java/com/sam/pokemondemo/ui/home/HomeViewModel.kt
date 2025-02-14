@@ -3,9 +3,14 @@ package com.sam.pokemondemo.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sam.pokemondemo.R
+import com.sam.pokemondemo.model.DisplayPokemon
 import com.sam.pokemondemo.model.DisplayTypeWithPokemons
 import com.sam.pokemondemo.source.repo.SharedPreferenceRepository
+import com.sam.pokemondemo.source.room.entity.CaptureEntity
+import com.sam.pokemondemo.source.usecase.DeleteCaptureByIdUseCase
+import com.sam.pokemondemo.source.usecase.GetCapturedPokemonsUseCase
 import com.sam.pokemondemo.source.usecase.GetTypeWithPokemonsUseCase
+import com.sam.pokemondemo.source.usecase.InsertCaptureUseCase
 import com.sam.pokemondemo.source.usecase.UpdatePokemonsFromRemoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +28,9 @@ class HomeViewModel @Inject constructor(
     private val spRepository: SharedPreferenceRepository,
     private val updatePokemonsFromRemote: UpdatePokemonsFromRemoteUseCase,
     private val getTypeWithPokemons: GetTypeWithPokemonsUseCase,
+    private val getCapturedPokemons: GetCapturedPokemonsUseCase,
+    private val insertCapture: InsertCaptureUseCase,
+    private val deleteCaptureById: DeleteCaptureByIdUseCase,
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -32,6 +40,9 @@ class HomeViewModel @Inject constructor(
 
     private val _typeWithPokemons = MutableStateFlow<List<DisplayTypeWithPokemons>>(emptyList())
     val typeWithPokemons = _typeWithPokemons.asStateFlow()
+
+    private val _capturedPokemons = MutableStateFlow<List<DisplayPokemon>>(emptyList())
+    val capturedPokemons = _capturedPokemons.asStateFlow()
 
     private val isForceTriggeredUpdate = MutableSharedFlow<Unit>()
 
@@ -85,6 +96,30 @@ class HomeViewModel @Inject constructor(
         if (isLoading.value) return
         viewModelScope.launch(Dispatchers.IO) {
             isForceTriggeredUpdate.emit(Unit)
+        }
+    }
+
+    private fun collectCapturedPokemons() {
+        viewModelScope.launch {
+            getCapturedPokemons.invoke().collectLatest {
+                _capturedPokemons.value = it
+            }
+        }
+    }
+
+    fun removePokemonCaptured(captureId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteCaptureById.invoke(captureId)
+        }
+    }
+
+    fun addPokemonCaptured(pokemonId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val capture = CaptureEntity(
+                pokemonId = pokemonId,
+                capturedTime = System.currentTimeMillis(),
+            )
+            insertCapture.invoke(capture)
         }
     }
 }
