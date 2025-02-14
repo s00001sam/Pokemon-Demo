@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -20,6 +21,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -156,5 +158,16 @@ fun MyPullToRefreshBox(
             refreshing = isRefreshing,
             state = refreshState,
         )
+    }
+}
+
+/**
+ * 確保 LazyColumn 再 Navigation 後會保存位置
+ */
+@Composable
+fun <T : Any> List<T>.rememberLazyListState(): LazyListState {
+    return when (size) {
+        0 -> remember(this) { LazyListState(0, 0) }
+        else -> androidx.compose.foundation.lazy.rememberLazyListState()
     }
 }

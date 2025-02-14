@@ -56,6 +56,7 @@ import com.sam.pokemondemo.model.DisplayTypeWithPokemons
 import com.sam.pokemondemo.ui.MyErrorSnackbar
 import com.sam.pokemondemo.ui.MyImage
 import com.sam.pokemondemo.ui.MyPullToRefreshBox
+import com.sam.pokemondemo.ui.rememberLazyListState
 import com.sam.pokemondemo.ui.theme.body
 import com.sam.pokemondemo.ui.theme.headline1
 
@@ -147,6 +148,7 @@ fun HomeContent(
 ) {
     LazyColumn(
         modifier = modifier,
+        state = typeWithPokemonsList.rememberLazyListState()
     ) {
         // My Pocket
         stickyHeader {
