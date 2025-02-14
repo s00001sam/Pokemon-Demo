@@ -10,6 +10,17 @@ import com.sam.pokemondemo.R
 
 val Typography = Typography()
 
+val Typography.title: TextStyle
+    @Composable
+    get() {
+        return TextStyle(
+            color = colorResource(id = R.color.text_color),
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            lineHeight = 28.sp,
+        )
+    }
+
 val Typography.headline1: TextStyle
     @Composable
     get() {

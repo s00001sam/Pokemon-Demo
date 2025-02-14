@@ -6,4 +6,8 @@
     <string name="my_pocket_empty">My Pocket is Empty</string>
     <string name="empty_view_title">Without Pokemons\nDo you want to try retrieving the data?</string>
     <string name="empty_view_button">Retrieve</string>
+    <string name="pokemon_id">#%d</string>
+    <string name="evolves_from_title">Evolves From</string>
+
+    <string name="content_description_back">back</string>
 </resources>

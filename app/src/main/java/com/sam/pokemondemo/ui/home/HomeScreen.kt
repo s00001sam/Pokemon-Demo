@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.sam.pokemondemo.Detail
 import com.sam.pokemondemo.R
@@ -82,8 +83,8 @@ fun HomeScreen(
             }
         }
     ) { contentPadding ->
-        val capturedPokemonList by viewModel.capturedPokemons.collectAsState(emptyList())
-        val typeWithPokemonsList by viewModel.typeWithPokemons.collectAsState(emptyList())
+        val capturedPokemonList by viewModel.capturedPokemons.collectAsStateWithLifecycle(emptyList())
+        val typeWithPokemonsList by viewModel.typeWithPokemons.collectAsStateWithLifecycle(emptyList())
         val isEmptyVisible = errorMessageRes != null && typeWithPokemonsList.isEmpty()
 
         PullToRefreshBox(
@@ -376,11 +377,11 @@ fun HomePokemonItemView(
         Icon(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .size(40.dp)
+                .size(36.dp)
                 .clickable {
                     onCaptureClicked(pokemon)
                 }
-                .padding(8.dp),
+                .padding(4.dp),
             imageVector = Icons.Rounded.Favorite,
             tint = Color.Red,
             contentDescription = null,

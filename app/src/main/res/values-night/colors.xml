@@ -4,4 +4,5 @@
     <color name="text_color">#FFFFFF</color>
     <color name="snackbar_text">@color/black</color>
     <color name="button_text_color">#262626</color>
+    <color name="bg_tag">#26FFFFFF</color>
 </resources>

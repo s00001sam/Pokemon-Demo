@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Text
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.sam.pokemondemo.R
+import com.sam.pokemondemo.ui.theme.body
 
 @Composable
 fun LoadingIndicator(
@@ -94,4 +97,28 @@ fun MyErrorSnackbar(
         containerColor = Color.Red,
         contentColor = colorResource(id = R.color.snackbar_text),
     )
+}
+
+@Composable
+fun MyTag(
+    modifier: Modifier = Modifier,
+    tagName: String,
+) {
+    val backgroundShape = RoundedCornerShape(50)
+
+    Box(
+        modifier = modifier
+            .background(
+                color = colorResource(R.color.bg_tag),
+                shape = backgroundShape,
+            )
+            .clip(backgroundShape)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = tagName,
+            style = MaterialTheme.typography.body,
+        )
+    }
 }
