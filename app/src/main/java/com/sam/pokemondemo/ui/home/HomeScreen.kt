@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,12 +50,12 @@ import com.sam.pokemondemo.model.BasicDisplayPokemon
 import com.sam.pokemondemo.model.CapturedDisplayPokemon
 import com.sam.pokemondemo.model.DisplayPokemon
 import com.sam.pokemondemo.model.DisplayTypeWithPokemons
-import com.sam.pokemondemo.ui.LoadingIndicator
 import com.sam.pokemondemo.ui.MyErrorSnackbar
 import com.sam.pokemondemo.ui.MyImage
 import com.sam.pokemondemo.ui.theme.body
 import com.sam.pokemondemo.ui.theme.headline1
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -79,15 +83,22 @@ fun HomeScreen(
     ) { contentPadding ->
         val capturedPokemonList by viewModel.capturedPokemons.collectAsState(emptyList())
         val typeWithPokemonsList by viewModel.typeWithPokemons.collectAsState(emptyList())
+        val isEmptyVisible = errorMessageRes != null && typeWithPokemonsList.isEmpty()
 
-        Box(
+        PullToRefreshBox(
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize(),
+            isRefreshing = isLoading,
+            onRefresh = {
+                viewModel.resetErrorMessage()
+                viewModel.updatePokemonsFromRemote()
+            },
         ) {
             HomeContent(
                 modifier = Modifier
                     .fillMaxSize(),
+                isEmptyVisible = isEmptyVisible,
                 capturedPokemons = capturedPokemonList,
                 typeWithPokemonsList = typeWithPokemonsList,
                 onCapturedAdded = { pokemon ->
@@ -103,13 +114,12 @@ fun HomeScreen(
                 toDetail = {
                     // TODO: navigation to detail
                 },
+                onRetryClicked = {
+                    viewModel.resetErrorMessage()
+                    viewModel.updatePokemonsFromRemote()
+                }
             )
         }
-
-        if (isLoading) LoadingIndicator(
-            modifier = Modifier
-                .fillMaxSize(),
-        )
     }
 }
 
@@ -117,11 +127,13 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
+    isEmptyVisible: Boolean,
     capturedPokemons: List<DisplayPokemon>,
     typeWithPokemonsList: List<DisplayTypeWithPokemons>,
     onCapturedAdded: (DisplayPokemon) -> Unit = {},
     onCapturedRemoved: (DisplayPokemon) -> Unit = {},
     toDetail: (DisplayPokemon) -> Unit = {},
+    onRetryClicked: () -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier,
@@ -157,6 +169,49 @@ fun HomeContent(
                 isBottomLineVisible = false,
                 onPokemonClicked = toDetail,
                 onCaptureClicked = onCapturedAdded,
+            )
+        }
+
+        // Empty
+        if (isEmptyVisible) item {
+            EmptyView(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                onRetryClicked = onRetryClicked,
+            )
+        }
+    }
+}
+
+@Composable
+fun EmptyView(
+    modifier: Modifier = Modifier,
+    onRetryClicked: () -> Unit = {},
+) {
+    Column(
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = stringResource(R.string.empty_view_title),
+            style = MaterialTheme.typography.headline1,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(Modifier.size(24.dp))
+
+        Button(
+            onClick = {
+                onRetryClicked()
+            },
+        ) {
+            Text(
+                text = stringResource(R.string.empty_view_button),
+                style = MaterialTheme.typography.headline1,
+                color = colorResource(R.color.button_text_color),
             )
         }
     }
@@ -248,6 +303,10 @@ fun HomePokemonLazyRow(
     ) {
         items(
             count = pokemons.size,
+            key = { i ->
+                val captureId = (pokemons[i] as? CapturedDisplayPokemon)?.captureId ?: -1
+                "${pokemons[i].pokemonId}-$captureId"
+            }
         ) { index ->
             Row {
                 if (index == 0) Spacer(

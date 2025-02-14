@@ -3,4 +3,5 @@
     <color name="bg_image_error">#73000000</color>
     <color name="text_color">#FFFFFF</color>
     <color name="snackbar_text">@color/black</color>
+    <color name="button_text_color">#262626</color>
 </resources>

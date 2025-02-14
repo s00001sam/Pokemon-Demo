@@ -11,4 +11,5 @@
     <color name="bg_image_error">#73FFFFFF</color>
     <color name="text_color">#262626</color>
     <color name="snackbar_text">@color/white</color>
+    <color name="button_text_color">#FFFFFF</color>
 </resources>

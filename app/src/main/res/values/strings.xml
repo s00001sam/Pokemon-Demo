@@ -4,4 +4,6 @@
     <string name="image_error">404</string>
     <string name="my_pocket_title">My Pocket</string>
     <string name="my_pocket_empty">My Pocket is Empty</string>
+    <string name="empty_view_title">Without Pokemons\nDo you want to try retrieving the data?</string>
+    <string name="empty_view_button">Retrieve</string>
 </resources>

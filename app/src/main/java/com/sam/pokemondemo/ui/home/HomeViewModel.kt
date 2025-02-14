@@ -93,7 +93,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun updatePokemonsFromRemote() {
+    fun updatePokemonsFromRemote() {
         if (isLoading.value) return
         viewModelScope.launch(Dispatchers.IO) {
             isForceTriggeredUpdate.emit(Unit)
@@ -122,5 +122,9 @@ class HomeViewModel @Inject constructor(
             )
             insertCapture.invoke(capture)
         }
+    }
+
+    fun resetErrorMessage() {
+        _errorMessageRes.tryEmit(null)
     }
 }
