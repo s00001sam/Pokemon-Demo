@@ -18,7 +18,17 @@ data class PokemonEntity(
     val evolvesFromName: String = "",
     @ColumnInfo(defaultValue = "")
     val description: String = "",
-) : Parcelable
+) : Parcelable {
+    companion object {
+        fun BasicPokemonInfos.toPokemonEntity(): PokemonEntity {
+            return PokemonEntity(
+                id = id,
+                name = name,
+                imageUrl = imageUrl,
+            )
+        }
+    }
+}
 
 data class BasicPokemonInfos(
     val id: Int = -1,

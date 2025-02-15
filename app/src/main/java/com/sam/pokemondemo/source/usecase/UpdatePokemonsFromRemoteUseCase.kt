@@ -1,5 +1,6 @@
 package com.sam.pokemondemo.source.usecase
 
+import com.sam.pokemondemo.handleResponseError
 import com.sam.pokemondemo.model.State
 import com.sam.pokemondemo.source.apiservice.PokemonApiService.Companion.DEFAULT_GET_POKEMONS_URL
 import com.sam.pokemondemo.source.repo.BaseRepository
@@ -30,6 +31,7 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
         runCatching {
             val remoteBasicResults = withContext(Dispatchers.IO) {
                 val response = repo.getRemoteBasicPokemons(DEFAULT_GET_POKEMONS_URL)
+                response.handleResponseError()
                 response.body()?.results.orEmpty()
             }
 
@@ -49,7 +51,9 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
                                 if (result.url == null || result.name == null) return@async null
                                 if (firstTimeLoadedNames.contains(result.name)) return@async null
 
-                                repo.getRemotePokemon(url = result.url).body()
+                                repo.getRemotePokemon(url = result.url).also {
+                                    it.handleResponseError()
+                                }.body()
                             }
                                 .onFailure(Timber::e)
                                 .getOrNull()

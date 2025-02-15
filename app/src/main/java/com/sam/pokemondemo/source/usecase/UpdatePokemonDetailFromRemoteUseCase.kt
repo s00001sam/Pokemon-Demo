@@ -1,5 +1,6 @@
 package com.sam.pokemondemo.source.usecase
 
+import com.sam.pokemondemo.handleResponseError
 import com.sam.pokemondemo.model.State
 import com.sam.pokemondemo.source.repo.BaseRepository
 import com.sam.pokemondemo.source.room.entity.PokemonEntity
@@ -22,10 +23,14 @@ class UpdatePokemonDetailFromRemoteUseCase @Inject constructor(
     fun invoke(pokemonId: Int): Flow<State<Any>> = flow {
         runCatching {
             val basicRemotePokemon = CoroutineScope(Dispatchers.IO).async {
-                repo.getRemotePokemon(pokemonId)
+                repo.getRemotePokemon(pokemonId).also {
+                    it.handleResponseError()
+                }
             }.await().body()
             val species = CoroutineScope(Dispatchers.IO).async {
-                repo.getRemotePokemonSpecies(pokemonId)
+                repo.getRemotePokemonSpecies(pokemonId).also {
+                    it.handleResponseError()
+                }
             }.await().body()
             val pokemon = PokemonEntity(
                 id = basicRemotePokemon?.id ?: 0,
