@@ -5,12 +5,14 @@ import com.google.common.truth.Truth.assertThat
 import com.sam.pokemondemo.TestCoroutineRule
 import com.sam.pokemondemo.source.repo.FakeErrorRepository
 import com.sam.pokemondemo.source.repo.FakeNormalRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class UpdatePokemonDetailFromRemoteUseCaseTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -22,12 +24,10 @@ class UpdatePokemonDetailFromRemoteUseCaseTest {
 
     @Before
     fun setup() {
-        normalRepo = FakeNormalRepository()
-        errorRepo = FakeErrorRepository()
+        normalRepo = FakeNormalRepository().apply { initAllBasicData() }
+        errorRepo = FakeErrorRepository().apply { initAllBasicData() }
         normalUseCase = UpdatePokemonDetailFromRemoteUseCase(normalRepo)
         errorUseCase = UpdatePokemonDetailFromRemoteUseCase(errorRepo)
-        normalRepo.initAllBasicData()
-        errorRepo.initAllBasicData()
     }
 
     /**

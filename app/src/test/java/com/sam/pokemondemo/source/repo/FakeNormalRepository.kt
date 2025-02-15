@@ -208,7 +208,7 @@ class FakeNormalRepository : BaseRepository {
                     imageUrl = pokemon.imageUrl,
                     capturedTime = capture.capturedTime,
                 )
-            }
+            }.sortedByDescending { it.capturedTime }
         }
     }
 
