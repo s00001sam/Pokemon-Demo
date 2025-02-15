@@ -2,6 +2,7 @@ package com.sam.pokemondemo.source
 
 import com.sam.pokemondemo.model.TestPokemonModel
 import com.sam.pokemondemo.model.TestTypeModel
+import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
 
 val mockTypes = listOf(
     TestTypeModel(name = "type1", url = "https://com.sam.pokemon/type1"),
@@ -28,3 +29,15 @@ val typePokemonMap: Map<String, List<TestPokemonModel>> = mapOf(
     mockTypes[2].name to (10..20).map { mockPokemons[it - 1] },
     mockTypes[3].name to (15..22).map { mockPokemons[it - 1] },
 )
+
+fun getAllTypePokemonCrossRefs(): List<TypePokemonCrossRef> {
+    return typePokemonMap.flatMap { entry ->
+        val (typeName, pokemons) = entry
+        pokemons.map { pokemon ->
+            TypePokemonCrossRef(
+                typeName = typeName,
+                pokemonId = pokemon.id,
+            )
+        }
+    }
+}

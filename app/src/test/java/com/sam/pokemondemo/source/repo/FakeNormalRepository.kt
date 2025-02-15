@@ -8,6 +8,7 @@ import com.sam.pokemondemo.model.Other
 import com.sam.pokemondemo.model.PokemonSpeciesResponse
 import com.sam.pokemondemo.model.RemotePokemonResponse
 import com.sam.pokemondemo.model.SpritesResponse
+import com.sam.pokemondemo.source.getAllTypePokemonCrossRefs
 import com.sam.pokemondemo.source.mockPokemons
 import com.sam.pokemondemo.source.mockTypes
 import com.sam.pokemondemo.source.room.entity.BasicPokemonInfos
@@ -21,6 +22,8 @@ import com.sam.pokemondemo.source.room.entity.TypeEntity
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
 import com.sam.pokemondemo.source.room.entity.TypeWithPokemons
 import com.sam.pokemondemo.source.toBaseResponses
+import com.sam.pokemondemo.source.toBasicPokemonEntities
+import com.sam.pokemondemo.source.toTypeEntities
 import com.sam.pokemondemo.source.toTypeResponses
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +48,13 @@ class FakeNormalRepository : BaseRepository {
         currCaptures.tryEmit(emptyList())
         currTypePokemonCrossRefs.tryEmit(emptyList())
         pokemonsGotFromRemote.clear()
+    }
+
+    // 初始化首頁的資料
+    fun initAllBasicData() {
+        currPokemons.tryEmit(mockPokemons.toBasicPokemonEntities())
+        currTypes.tryEmit(mockTypes.toTypeEntities())
+        currTypePokemonCrossRefs.tryEmit(getAllTypePokemonCrossRefs())
     }
 
     override suspend fun getRemoteBasicPokemons(url: String): Response<BasicPokemonsResponse> {

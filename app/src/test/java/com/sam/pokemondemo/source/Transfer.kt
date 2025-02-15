@@ -6,6 +6,7 @@ import com.sam.pokemondemo.model.TestPokemonModel
 import com.sam.pokemondemo.model.TestTypeModel
 import com.sam.pokemondemo.model.TypeResponse
 import com.sam.pokemondemo.source.room.entity.PokemonEntity
+import com.sam.pokemondemo.source.room.entity.TypeEntity
 
 fun List<TestPokemonModel>.toBaseResponses(): List<BaseResponse> {
     return this.map {
@@ -21,6 +22,14 @@ fun List<TestTypeModel>.toTypeResponses(): List<TypeResponse> {
     }
 }
 
+fun List<TestTypeModel>.toTypeEntities(): List<TypeEntity> {
+    return this.map {
+        TypeEntity(
+            name = it.name,
+        )
+    }
+}
+
 fun List<TestPokemonModel>.toPokemonEntities(): List<PokemonEntity> {
     return this.map {
         PokemonEntity(
@@ -29,6 +38,16 @@ fun List<TestPokemonModel>.toPokemonEntities(): List<PokemonEntity> {
             imageUrl = it.imageUrl,
             evolvesFromName = it.evolvesFromName,
             description = it.description,
+        )
+    }
+}
+
+fun List<TestPokemonModel>.toBasicPokemonEntities(): List<PokemonEntity> {
+    return this.map {
+        PokemonEntity(
+            id = it.id,
+            name = it.name,
+            imageUrl = it.imageUrl,
         )
     }
 }

@@ -113,7 +113,7 @@ class UpdatePokemonsFromRemoteUseCaseTest {
     }
 
     @After
-    fun clear() {
+    fun tearDown() {
         normalRepo.clear()
         errorRepo.clear()
     }

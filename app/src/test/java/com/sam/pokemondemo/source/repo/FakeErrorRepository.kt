@@ -3,6 +3,9 @@ package com.sam.pokemondemo.source.repo
 import com.sam.pokemondemo.model.BasicPokemonsResponse
 import com.sam.pokemondemo.model.PokemonSpeciesResponse
 import com.sam.pokemondemo.model.RemotePokemonResponse
+import com.sam.pokemondemo.source.getAllTypePokemonCrossRefs
+import com.sam.pokemondemo.source.mockPokemons
+import com.sam.pokemondemo.source.mockTypes
 import com.sam.pokemondemo.source.room.entity.BasicPokemonInfos
 import com.sam.pokemondemo.source.room.entity.CaptureEntity
 import com.sam.pokemondemo.source.room.entity.CapturedPokemonView
@@ -13,6 +16,8 @@ import com.sam.pokemondemo.source.room.entity.PokemonEntity.Companion.toPokemonE
 import com.sam.pokemondemo.source.room.entity.TypeEntity
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
 import com.sam.pokemondemo.source.room.entity.TypeWithPokemons
+import com.sam.pokemondemo.source.toBasicPokemonEntities
+import com.sam.pokemondemo.source.toTypeEntities
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +37,13 @@ class FakeErrorRepository : BaseRepository {
         currTypes.tryEmit(emptyList())
         currCaptures.tryEmit(emptyList())
         currTypePokemonCrossRefs.tryEmit(emptyList())
+    }
+
+    // 初始化首頁的資料
+    fun initAllBasicData() {
+        currPokemons.tryEmit(mockPokemons.toBasicPokemonEntities())
+        currTypes.tryEmit(mockTypes.toTypeEntities())
+        currTypePokemonCrossRefs.tryEmit(getAllTypePokemonCrossRefs())
     }
 
     override suspend fun getRemoteBasicPokemons(url: String): Response<BasicPokemonsResponse> {
