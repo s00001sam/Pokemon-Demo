@@ -134,7 +134,7 @@ class FakeErrorRepository : BaseRepository {
         currCaptures.tryEmit(new)
     }
 
-    override fun getLocalCapturedPokemons(): Flow<List<CapturedPokemonView>> {
+    override fun getLocalCapturedPokemonsByTimeDesc(): Flow<List<CapturedPokemonView>> {
         return combine(
             currPokemons,
             currCaptures,

@@ -23,7 +23,7 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
     private val repo: BaseRepository,
 ) {
     /**
-     * @param isFirstTimeLoadFinished 第一次載入是否完成，如果未完成，則繼續
+     * @param isFirstTimeLoadFinished If the first load is not finished, proceed with the process
      */
     fun invoke(
         isFirstTimeLoadFinished: Boolean,
@@ -36,7 +36,7 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
             }
 
             /**
-             * 第一次載入未完成，需要知道已經載入了哪些
+             * If the initial load is incomplete, need to know what has already been loaded
              */
             val firstTimeLoadedNames: List<String> = when (isFirstTimeLoadFinished) {
                 true -> emptyList()

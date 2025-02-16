@@ -35,7 +35,7 @@ class MyApplication : Application(), ImageLoaderFactory {
     }
 
     /**
-     * 運用 Coil 的緩存機制設定緩存限制
+     * Implement Coil's caching configuration
      */
     override fun newImageLoader(): ImageLoader {
         return ImageLoader(this).newBuilder()

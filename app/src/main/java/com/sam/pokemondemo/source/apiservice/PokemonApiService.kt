@@ -10,9 +10,11 @@ import retrofit2.http.Url
 
 interface PokemonApiService {
     /**
-     * 考量後續可能需要做多頁的資料拿取，使用 Url
+     * Since the Response's next field is a url,
      *
-     *  因為 Response 的 next 也是 url
+     * and considering the potential need to retrieve data from multiple pages in the future,
+     *
+     * url is currently being used
      */
     @GET
     suspend fun getBasicPokemons(

@@ -58,7 +58,7 @@ class PokemonRepository @Inject constructor(
         localDataSource.deleteCaptureById(id)
     }
 
-    override fun getLocalCapturedPokemons(): Flow<List<CapturedPokemonView>> {
+    override fun getLocalCapturedPokemonsByTimeDesc(): Flow<List<CapturedPokemonView>> {
         return localDataSource.getLocalCapturedPokemons()
     }
 

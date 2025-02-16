@@ -34,14 +34,14 @@ class UpdatePokemonsFromRemoteUseCaseTest {
     }
 
     /**
-     * 模擬完全載入成功
-     * - 觸發 normalUseCase invoke(true)
-     * - 檢查 應該有 loading state
-     * - 檢查 資料庫 pokemon 應該為空
-     * - 檢查 資料庫 type 應該為空
-     * - 檢查 應該有 success state
-     * - 檢查 資料庫 pokemon 應該為 22 筆
-     * - 檢查 資料庫 type 應該為 4 筆
+     * Test load successful
+     * - trigger normalUseCase invoke(true)
+     * - Confirmed: status should be loading
+     * - Confirmed: pokemon database should be empty
+     * - Confirmed: type database should be empty
+     * - Confirmed: status should be success
+     * - Confirmed: size of pokemon database should be 22
+     * - Confirmed: size of type database should be 4
      */
     @Test
     fun `confirm date update correctly`() = runTest {
@@ -49,7 +49,6 @@ class UpdatePokemonsFromRemoteUseCaseTest {
             assertThat(awaitItem().isLoading()).isTrue()
             assertThat(normalRepo.currPokemons.value.size).isEqualTo(0)
             assertThat(normalRepo.currTypes.value.size).isEqualTo(0)
-
             assertThat(awaitItem().isSuccess()).isTrue()
             assertThat(normalRepo.currPokemons.value.size).isEqualTo(22)
             assertThat(normalRepo.currTypes.value.size).isEqualTo(4)
@@ -58,15 +57,15 @@ class UpdatePokemonsFromRemoteUseCaseTest {
     }
 
     /**
-     * 模擬第一次未完全載入
-     * - 先注入前五筆資料 pokemon1 ~ pokemon5
-     * - 觸發 normalUseCase invoke(true)
-     * - 檢查 資料庫本來應該是五筆
-     * - 檢查 應該有 loading state
-     * - 檢查 應該有 success state
-     * - 檢查 從遠端拿到的資料不該包含 pokemon1
-     * - 檢查 從遠端拿到的資料不該包含 pokemon5
-     * - 檢查 從遠端拿到的資料應該包含 pokemon6
+     * Test load failed to fully complete on the first attempt
+     * - inject the first five entries (pokemon1 ~ pokemon5)
+     * - trigger normalUseCase invoke(true)
+     * - Confirmed: size of pokemon database should be 5
+     * - Confirmed: status should be loading
+     * - Confirmed: status should be success
+     * - Confirmed: data retrieved from remote should not include pokemon1
+     * - Confirmed: data retrieved from remote should not include pokemon5
+     * - Confirmed: data retrieved from remote should include pokemon6
      */
     @Test
     fun `confirm subsequent first data fetch`() {
@@ -87,14 +86,14 @@ class UpdatePokemonsFromRemoteUseCaseTest {
     }
 
     /**
-     * 模擬 API 錯誤
-     * - 觸發 errorUseCase invoke(true)
-     * - 檢查 資料庫 pokemon 應該空的
-     * - 檢查 資料庫 type 本來應該空的
-     * - 檢查 應該有 loading state
-     * - 檢查 應該有 error state
-     * - 檢查 資料庫 pokemon 應該空的
-     * - 檢查 資料庫 type 應該空的
+     * Test load failure
+     * - trigger errorUseCase invoke(true)
+     * - Confirmed: status should be loading
+     * - Confirmed: pokemon database should be empty
+     * - Confirmed: type database should be empty
+     * - Confirmed: status should be error
+     * - Confirmed: pokemon database should be empty
+     * - Confirmed: type database should be empty
      */
     @Test
     fun `confirm data fetch error`() {
@@ -103,7 +102,6 @@ class UpdatePokemonsFromRemoteUseCaseTest {
                 assertThat(awaitItem().isLoading()).isTrue()
                 assertThat(normalRepo.currPokemons.value.size).isEqualTo(0)
                 assertThat(normalRepo.currTypes.value.size).isEqualTo(0)
-
                 assertThat(awaitItem().isError()).isTrue()
                 assertThat(normalRepo.currPokemons.value.size).isEqualTo(0)
                 assertThat(normalRepo.currTypes.value.size).isEqualTo(0)

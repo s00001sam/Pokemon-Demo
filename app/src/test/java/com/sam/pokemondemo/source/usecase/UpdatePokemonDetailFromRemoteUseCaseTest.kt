@@ -31,13 +31,13 @@ class UpdatePokemonDetailFromRemoteUseCaseTest {
     }
 
     /**
-     * 模擬完全載入成功 (pokemonId = 5)
-     * - 觸發 normalUseCase invoke()
-     * - 檢查 應該有 loading state
-     * - 檢查 資料庫 pokemon id 為 5 應該存在
-     * - 檢查 資料庫 pokemon id 為 5 的 evolvesFromName 應該為空
-     * - 檢查 應該有 success state
-     * - 檢查 資料庫 pokemon id 為 5 的 evolvesFromName 應該為非空
+     * Test load successful (pokemonId = 5)
+     * - trigger normalUseCase invoke()
+     * - Confirmed: status should be loading
+     * - Confirmed: Pokemon with id 5 should be in the database
+     * - Confirmed: evolvesFromName of pokemon with id 5 is empty
+     * - Confirmed: status should be success
+     * - Confirmed: evolvesFromName of pokemon with id 5 is not empty
      */
     @Test
     fun `confirm date update correctly`() = runTest {
@@ -60,12 +60,12 @@ class UpdatePokemonDetailFromRemoteUseCaseTest {
     }
 
     /**
-     * 模擬完全載入失敗（遠端無此資料） (pokemonId = 30)
-     * - 觸發 errorUseCase invoke()
-     * - 檢查 應該有 loading state
-     * - 檢查 資料庫 pokemon id 為 30 應該不存在
-     * - 檢查 應該有 error state
-     * - 檢查 資料庫 pokemon id 為 30 應該不存在
+     * Test load failure (data not found remotely) (pokemonId = 30)
+     * - trigger errorUseCase invoke()
+     * - Confirmed: status should be loading
+     * - Confirmed: pokemon id 30 should not exist in the database
+     * - Confirmed: status should be error
+     * - Confirmed: pokemon id 30 should not exist in the database
      */
     @Test
     fun `confirm data fetch error due to not found`() = runTest {
@@ -86,13 +86,13 @@ class UpdatePokemonDetailFromRemoteUseCaseTest {
     }
 
     /**
-     * 模擬完全載入失敗 (pokemonId = 5)
-     * - 觸發 errorUseCase invoke()
-     * - 檢查 應該有 loading state
-     * - 檢查 資料庫 pokemon id 為 5 應該存在
-     * - 檢查 資料庫 pokemon id 為 5 的 evolvesFromName 應該為空
-     * - 檢查 應該有 error state
-     * - 檢查 資料庫 pokemon id 為 5 的 evolvesFromName 應該為空
+     * Test load failure (pokemonId = 5)
+     * - trigger errorUseCase invoke()
+     * - Confirmed: status should be loading
+     * - Confirmed: pokemon id 5 should not exist in the database
+     * - Confirmed: evolvesFromName of pokemon with id 5 is empty
+     * - Confirmed: status should be error
+     * - Confirmed: evolvesFromName of pokemon with id 5 is empty
      */
     @Test
     fun `confirm data fetch error`() = runTest {

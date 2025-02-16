@@ -28,7 +28,7 @@ interface BaseRepository {
     fun getLocalTypeWithPokemons(): Flow<List<TypeWithPokemons>>
     suspend fun insertCapture(capture: CaptureEntity)
     suspend fun deleteCaptureById(id: Int)
-    fun getLocalCapturedPokemons(): Flow<List<CapturedPokemonView>>
+    fun getLocalCapturedPokemonsByTimeDesc(): Flow<List<CapturedPokemonView>>
     suspend fun getRemotePokemonSpecies(id: Int): Response<PokemonSpeciesResponse>
     suspend fun updateDetails(
         pokemonEntity: PokemonEntity,

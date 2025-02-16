@@ -4,7 +4,7 @@ import retrofit2.Response
 import java.io.IOException
 
 /**
- * 處理 Response 的錯誤拋出錯誤
+ * Handle response errors by throwing exceptions
  */
 fun <T> Response<T>.handleResponseError() {
     when {

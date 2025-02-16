@@ -3,6 +3,7 @@ package com.sam.pokemondemo.source.usecase
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.sam.pokemondemo.TestCoroutineRule
+import com.sam.pokemondemo.model.CapturedDisplayPokemon
 import com.sam.pokemondemo.source.repo.FakeNormalRepository
 import com.sam.pokemondemo.source.room.entity.CaptureEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,15 +28,16 @@ class GetCapturedPokemonsUseCaseTest {
     }
 
     /**
-     * 測試捕捉列表收集
-     * - 觸發 useCase invoke()
-     * - 確認 資料庫至少有一隻 Pokemon 可以抓
-     * - 檢查 初始化的捕捉數量應該為 0
-     * - 捕捉資料庫的第一隻 Pokemon
-     * - 檢查 目前的捕捉數量應該為 1
+     * Testing the capture list
+     * - trigger useCase invoke()
+     * - Confirmed: database has at least one catchable Pokemon
+     * - Confirmed: initial capture count should be 0
+     * - capture 1st Pokemon in the database
+     * - Confirmed: capture count should be 1
+     * - Confirmed: return type in list should be CapturedDisplayPokemon
      */
     @Test
-    fun `confirm capture list collect is correct`() = runTest {
+    fun `confirmed capture list is correct`() = runTest {
         useCase.invoke().test {
             assertThat(repo.currPokemons.value.size).isGreaterThan(1)
 
@@ -48,21 +50,23 @@ class GetCapturedPokemonsUseCaseTest {
                     capturedTime = System.currentTimeMillis(),
                 ),
             )
-            assertThat(awaitItem().size).isEqualTo(1)
+            val result = awaitItem()
+            assertThat(result.size).isEqualTo(1)
+            assertThat(result[0]).isInstanceOf(CapturedDisplayPokemon::class.java)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     /**
-     * 測試可以重複收集同一隻 Pokemon
-     * - 觸發 useCase invoke()
-     * - 確認 資料庫至少有一隻 Pokemon 可以抓
-     * - 檢查 初始化的捕捉數量應該為 0
-     * - 捕捉資料庫的第一隻 Pokemon
-     * - 捕捉資料庫的第一隻 Pokemon
-     * - 檢查 目前的捕捉數量應該為 2
-     * - 檢查 捕捉列表裡面第一筆和第二筆 pokemonId 應該一樣
+     * Test capturing duplicate Pokemon
+     * - trigger useCase invoke()
+     * - Confirmed: database has at least one catchable Pokemon
+     * - Confirmed: initial capture count should be 0
+     * - capture 1st Pokemon in the database
+     * - capture 1st Pokemon in the database again
+     * - Confirmed: capture count should be 2
+     * - Confirmed: 1st and 2nd captures have the same id
      */
     @Test
     fun `confirm can capture the same pokemon`() = runTest {
@@ -96,15 +100,14 @@ class GetCapturedPokemonsUseCaseTest {
     }
 
     /**
-     * 測試捕捉列表收集會依照捕捉時間排序(DESC)
-     * - 觸發 useCase invoke()
-     * - 確認 資料庫至少有一隻 Pokemon 可以抓
-     * - 檢查 初始化的捕捉數量應該為 0
-     * - 捕捉資料庫的第一隻 Pokemon
-     * - 延遲 1000ms
-     * - 捕捉資料庫的第一隻 Pokemon（因為時間可能拿到一樣所以補加上 1000ms）
-     * - 檢查 目前的捕捉數量應該為 2
-     * - 檢查 捕捉列表裡面第一筆和第二筆 pokemonId 應該一樣
+     * Test capture list is sorted by capture time (descending)
+     * - trigger useCase invoke()
+     * - Confirmed: database has at least one catchable Pokemon
+     * - Confirmed: initial capture count should be 0
+     * - capture 1st Pokemon in the database
+     * - capture 1st Pokemon in the database again（due to the duplicate timestamps, a 1000ms offset is included）
+     * - Confirmed: capture count should be 2
+     * - Confirmed: 1st captureTime should be greater than the 2nd
      */
     @Test
     fun `confirm capture list sort by captureTime DESC`() = runTest {

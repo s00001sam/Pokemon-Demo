@@ -139,7 +139,7 @@ fun MyTag(
 }
 
 /**
- * 發現 Material 3 PullToRefreshBox 有卡住的問題，這邊先使用 Material 2
+ * Encountered a freezing issue with Material 3 PullToRefreshBox, switching to Material 2
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -169,7 +169,7 @@ fun MyPullToRefreshBox(
 }
 
 /**
- * 確保 LazyColumn 再 Navigation 後會保存位置
+ * Ensure that the LazyColumn's position is maintained after navigation
  */
 @Composable
 fun <T : Any> List<T>.rememberLazyListState(): LazyListState {
