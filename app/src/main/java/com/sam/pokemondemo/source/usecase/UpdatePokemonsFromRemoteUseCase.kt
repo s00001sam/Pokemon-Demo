@@ -58,14 +58,14 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
                                 .onFailure(Timber::e)
                                 .getOrNull()
                         }
-                    }.awaitAll() // 等待這一批全部完成
-                }.filterNotNull() // 過濾掉失敗的請求
+                    }.awaitAll() // Wait for this batch to complete
+                }.filterNotNull() // Filter out failed requests
                     .also { remotePokemon ->
                         val basicInfos = remotePokemon.map { it.getBasicPokemonInfos() }
                         val refs = remotePokemon.toTypePokemonCrossRefs()
                         val types = remotePokemon.flatMap { it.types.toTypeEntities() }
 
-                        // 將這一批數據存入資料庫
+                        // Store this batch of data in the database
                         withContext(Dispatchers.IO) {
                             repo.upsertBasicPokemonsAndTypes(
                                 basicInfos = basicInfos,
@@ -88,7 +88,7 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
         }
 
     companion object {
-        // 每次同時處理的 API 數量
+        // Number of APIs processed at the same time
         private const val BATCH_SIZE = 10
     }
 }

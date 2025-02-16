@@ -31,17 +31,17 @@ class UpdatePokemonDetailFromRemoteUseCaseTest {
     }
 
     /**
-     * Test load successful (pokemonId = 5)
+     * Test load successful (pokemonId = 6)
      * - trigger normalUseCase invoke()
      * - Confirmed: status should be loading
-     * - Confirmed: Pokemon with id 5 should be in the database
-     * - Confirmed: evolvesFromName of pokemon with id 5 is empty
+     * - Confirmed: Pokemon with id 6 should be in the database
+     * - Confirmed: evolvesFromName of pokemon with id 6 is empty
      * - Confirmed: status should be success
-     * - Confirmed: evolvesFromName of pokemon with id 5 is not empty
+     * - Confirmed: evolvesFromName of pokemon with id 6 is not empty
      */
     @Test
     fun `confirm date update correctly`() = runTest {
-        val currPokemonId = 5
+        val currPokemonId = 6
         normalUseCase.invoke(currPokemonId).test {
             assertThat(awaitItem().isLoading()).isTrue()
 
@@ -53,7 +53,7 @@ class UpdatePokemonDetailFromRemoteUseCaseTest {
             assertThat(awaitItem().isSuccess()).isTrue()
 
             val nextPokemon = normalRepo.currPokemons.value.find { it.id == currPokemonId }
-            assertThat(nextPokemon?.evolvesFromName.orEmpty()).isEqualTo("pokemon4")
+            assertThat(nextPokemon?.evolvesFromName.orEmpty()).isEqualTo("pokemon5")
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -86,17 +86,17 @@ class UpdatePokemonDetailFromRemoteUseCaseTest {
     }
 
     /**
-     * Test load failure (pokemonId = 5)
+     * Test load failure (pokemonId = 6)
      * - trigger errorUseCase invoke()
      * - Confirmed: status should be loading
-     * - Confirmed: pokemon id 5 should not exist in the database
-     * - Confirmed: evolvesFromName of pokemon with id 5 is empty
+     * - Confirmed: pokemon id 6 should not exist in the database
+     * - Confirmed: evolvesFromName of pokemon with id 6 is empty
      * - Confirmed: status should be error
-     * - Confirmed: evolvesFromName of pokemon with id 5 is empty
+     * - Confirmed: evolvesFromName of pokemon with id 6 is empty
      */
     @Test
     fun `confirm data fetch error`() = runTest {
-        val currPokemonId = 5
+        val currPokemonId = 6
         errorUseCase.invoke(currPokemonId).test {
             assertThat(awaitItem().isLoading()).isTrue()
             val prevPokemon = normalRepo.currPokemons.value.find { it.id == currPokemonId }

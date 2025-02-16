@@ -28,7 +28,7 @@ class GetCapturedPokemonsUseCaseTest {
     }
 
     /**
-     * Testing the capture list
+     * Test the capture list
      * - trigger useCase invoke()
      * - Confirmed: database has at least one catchable Pokemon
      * - Confirmed: initial capture count should be 0

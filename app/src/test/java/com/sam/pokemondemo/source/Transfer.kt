@@ -30,16 +30,18 @@ fun List<TestTypeModel>.toTypeEntities(): List<TypeEntity> {
     }
 }
 
+fun TestPokemonModel.toPokemonEntity(): PokemonEntity {
+    return PokemonEntity(
+        id = this.id,
+        name = this.name,
+        imageUrl = this.imageUrl,
+        evolvesFromName = this.evolvesFromName,
+        description = this.description,
+    )
+}
+
 fun List<TestPokemonModel>.toPokemonEntities(): List<PokemonEntity> {
-    return this.map {
-        PokemonEntity(
-            id = it.id,
-            name = it.name,
-            imageUrl = it.imageUrl,
-            evolvesFromName = it.evolvesFromName,
-            description = it.description,
-        )
-    }
+    return this.map { it.toPokemonEntity() }
 }
 
 fun List<TestPokemonModel>.toBasicPokemonEntities(): List<PokemonEntity> {

@@ -12,7 +12,7 @@ val mockTypes = listOf(
 )
 
 val mockPokemons = (1..22).mapIndexed { _, index ->
-    val evolvesFromName = if (index % 4 == 1) "pokemon${index - 1}" else ""
+    val evolvesFromName = if (index % 4 == 2) "pokemon${index - 1}" else ""
     TestPokemonModel(
         id = index,
         url = "https://com.sam.pokemon/$index",

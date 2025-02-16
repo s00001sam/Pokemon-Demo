@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.room)
 }
 
-// 存放 Room schema 的目錄
+// Directory for Room schemas
 room {
     schemaDirectory("$projectDir/schemas")
 }

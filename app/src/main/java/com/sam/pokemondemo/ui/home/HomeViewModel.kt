@@ -52,7 +52,7 @@ class HomeViewModel @Inject constructor(
         collectTypeWithPokemons()
         collectCapturedPokemons()
 
-        // 第一次進來 or 第一次未完成
+        // "First time here" or "First time unfinished"
         if (!spRepository.isEverLoad || !spRepository.isFirstTimeLoadFinished) {
             spRepository.isFirstTimeLoadFinished = false
             updatePokemonsFromRemote()

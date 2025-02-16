@@ -17,12 +17,12 @@ import com.sam.pokemondemo.source.room.entity.TypeEntity
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
 import com.sam.pokemondemo.source.room.entity.TypeWithPokemons
 import com.sam.pokemondemo.source.toBasicPokemonEntities
+import com.sam.pokemondemo.source.toPokemonEntity
 import com.sam.pokemondemo.source.toTypeEntities
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
@@ -39,11 +39,27 @@ class FakeErrorRepository : BaseRepository {
         currTypePokemonCrossRefs.tryEmit(emptyList())
     }
 
-    // 初始化首頁的資料
+    // Initialize the homepage data
     fun initAllBasicData() {
         currPokemons.tryEmit(mockPokemons.toBasicPokemonEntities())
         currTypes.tryEmit(mockTypes.toTypeEntities())
         currTypePokemonCrossRefs.tryEmit(getAllTypePokemonCrossRefs())
+    }
+
+    // Initialize the detail page data
+    fun initDetailsData(pokemonId: Int) {
+        val pokemons = currPokemons.value.toMutableList()
+        val index = currPokemons.value.indexOfFirst { it.id == pokemonId }
+        val entity = mockPokemons.find { it.id == pokemonId }?.toPokemonEntity() ?: return
+        when (index) {
+            -1 -> {
+                pokemons.add(entity)
+            }
+
+            else -> {
+                pokemons[index] = entity
+            }
+        }
     }
 
     override suspend fun getRemoteBasicPokemons(url: String): Response<BasicPokemonsResponse> {
@@ -185,24 +201,23 @@ class FakeErrorRepository : BaseRepository {
     }
 
     override fun getLocalDetailWithTypes(pokemonId: Int): Flow<DetailPokemonWithTypes> {
-        val currPokemon = currPokemons.value.find { it.id == pokemonId } ?: return flowOf()
-
         return combine(
             currPokemons,
             currTypePokemonCrossRefs,
         ) { pokemons, refs ->
-            val evolvesFrom = pokemons.find { it.name == currPokemon.evolvesFromName }
+            val currPokemon = pokemons.find { it.id == pokemonId }
+            val evolvesFrom = pokemons.find { it.name == currPokemon?.evolvesFromName }
             DetailPokemonWithTypes(
                 pokemon = DetailPokemonView(
-                    pokemonId = currPokemon.id,
-                    name = currPokemon.name,
-                    imageUrl = currPokemon.imageUrl,
-                    description = currPokemon.description,
+                    pokemonId = currPokemon?.id ?: -1,
+                    name = currPokemon?.name.orEmpty(),
+                    imageUrl = currPokemon?.imageUrl.orEmpty(),
+                    description = currPokemon?.description.orEmpty(),
                     evolvesFromId = evolvesFrom?.id ?: -1,
                     evolvesFromName = evolvesFrom?.name.orEmpty(),
                     evolvesFromImageUrl = evolvesFrom?.imageUrl.orEmpty(),
                 ),
-                typeRefs = refs.filter { it.pokemonId == currPokemon.id }
+                typeRefs = refs.filter { it.pokemonId == currPokemon?.id }
             )
         }
     }
