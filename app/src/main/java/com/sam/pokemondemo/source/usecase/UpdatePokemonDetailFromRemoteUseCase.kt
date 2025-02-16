@@ -39,7 +39,7 @@ class UpdatePokemonDetailFromRemoteUseCase @Inject constructor(
                 name = basicRemotePokemon?.name.orEmpty(),
                 imageUrl = basicRemotePokemon?.sprites?.other?.officialArtwork?.frontDefault.orEmpty(),
                 evolvesFromName = species?.evolvesFromSpecies?.name.orEmpty(),
-                description = species?.flavorTextEntries?.getOrNull(0)?.flavorText.orEmpty(),
+                description = species?.getDescription().orEmpty(),
             )
             val types = basicRemotePokemon?.types.toTypeEntities()
             val refs = types.mapNotNull { type ->
