@@ -2,6 +2,7 @@ package com.sam.pokemondemo.source.usecase
 
 import com.sam.pokemondemo.handleResponseError
 import com.sam.pokemondemo.model.State
+import com.sam.pokemondemo.source.imagepreloader.ImagePreloader
 import com.sam.pokemondemo.source.repo.BaseRepository
 import com.sam.pokemondemo.source.room.entity.PokemonEntity
 import com.sam.pokemondemo.source.room.entity.TypeEntity.Companion.toTypeEntities
@@ -19,6 +20,7 @@ import javax.inject.Inject
 
 class UpdatePokemonDetailFromRemoteUseCase @Inject constructor(
     private val repo: BaseRepository,
+    private val imagePreloader: ImagePreloader,
 ) {
     fun invoke(pokemonId: Int): Flow<State<Any>> = flow {
         runCatching {
@@ -46,6 +48,9 @@ class UpdatePokemonDetailFromRemoteUseCase @Inject constructor(
             }
 
             withContext(Dispatchers.IO) {
+                // Preload image
+                imagePreloader.load(listOf(pokemon.imageUrl))
+                // Store details in the database
                 repo.updateDetails(pokemon, refs, types)
             }
 

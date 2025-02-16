@@ -1,5 +1,6 @@
 package com.sam.pokemondemo.source.hilt
 
+import com.sam.pokemondemo.source.imagepreloader.ImagePreloader
 import com.sam.pokemondemo.source.repo.BaseRepository
 import com.sam.pokemondemo.source.usecase.DeleteCaptureByIdUseCase
 import com.sam.pokemondemo.source.usecase.GetCapturedPokemonsUseCase
@@ -19,7 +20,8 @@ class UseCaseModule {
     @Provides
     fun provideUpdatePokemonsFromRemoteUseCase(
         repository: BaseRepository,
-    ) = UpdatePokemonsFromRemoteUseCase(repository)
+        imagePreloader: ImagePreloader,
+    ) = UpdatePokemonsFromRemoteUseCase(repository, imagePreloader)
 
     @Provides
     fun provideGetTypeWithPokemonsUseCase(
@@ -44,7 +46,8 @@ class UseCaseModule {
     @Provides
     fun provideUpdatePokemonDetailFromRemoteUseCase(
         repository: BaseRepository,
-    ) = UpdatePokemonDetailFromRemoteUseCase(repository)
+        imagePreloader: ImagePreloader,
+    ) = UpdatePokemonDetailFromRemoteUseCase(repository, imagePreloader)
 
     @Provides
     fun provideGetDetailPokemonUseCase(

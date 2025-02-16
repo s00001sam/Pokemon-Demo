@@ -3,6 +3,7 @@ package com.sam.pokemondemo.source.usecase
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.sam.pokemondemo.TestCoroutineRule
+import com.sam.pokemondemo.source.imagepreloader.FakeImagePreloader
 import com.sam.pokemondemo.source.mockPokemons
 import com.sam.pokemondemo.source.repo.FakeErrorRepository
 import com.sam.pokemondemo.source.repo.FakeNormalRepository
@@ -22,6 +23,7 @@ class UpdatePokemonsFromRemoteUseCaseTest {
 
     private lateinit var normalRepo: FakeNormalRepository
     private lateinit var errorRepo: FakeErrorRepository
+    private lateinit var imagePreloader: FakeImagePreloader
     private lateinit var normalUseCase: UpdatePokemonsFromRemoteUseCase
     private lateinit var errorUseCase: UpdatePokemonsFromRemoteUseCase
 
@@ -29,8 +31,9 @@ class UpdatePokemonsFromRemoteUseCaseTest {
     fun setup() {
         normalRepo = FakeNormalRepository()
         errorRepo = FakeErrorRepository()
-        normalUseCase = UpdatePokemonsFromRemoteUseCase(normalRepo)
-        errorUseCase = UpdatePokemonsFromRemoteUseCase(errorRepo)
+        imagePreloader = FakeImagePreloader()
+        normalUseCase = UpdatePokemonsFromRemoteUseCase(normalRepo, imagePreloader)
+        errorUseCase = UpdatePokemonsFromRemoteUseCase(errorRepo, imagePreloader)
     }
 
     /**
@@ -44,7 +47,7 @@ class UpdatePokemonsFromRemoteUseCaseTest {
      * - Confirmed: size of type database should be 4
      */
     @Test
-    fun `confirm date update correctly`() = runTest {
+    fun `test load successful`() = runTest {
         normalUseCase.invoke(true).test {
             assertThat(awaitItem().isLoading()).isTrue()
             assertThat(normalRepo.currPokemons.value.size).isEqualTo(0)
@@ -52,6 +55,29 @@ class UpdatePokemonsFromRemoteUseCaseTest {
             assertThat(awaitItem().isSuccess()).isTrue()
             assertThat(normalRepo.currPokemons.value.size).isEqualTo(22)
             assertThat(normalRepo.currTypes.value.size).isEqualTo(4)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /**
+     * Test load images successful
+     * - Confirmed: downloaded images should be empty
+     * - trigger normalUseCase invoke(true)
+     * - Confirmed: status should be loading
+     * - Confirmed: status should be success
+     * - Confirmed: size of downloaded images should be 22
+     */
+    @Test
+    fun `test load images successful`() = runTest {
+        assertThat(imagePreloader.downloadImages).isEmpty()
+
+        normalUseCase.invoke(true).test {
+            assertThat(awaitItem().isLoading()).isTrue()
+
+            assertThat(awaitItem().isSuccess()).isTrue()
+
+            assertThat(imagePreloader.downloadImages.size).isEqualTo(22)
+
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -68,7 +94,7 @@ class UpdatePokemonsFromRemoteUseCaseTest {
      * - Confirmed: data retrieved from remote should include pokemon6
      */
     @Test
-    fun `confirm subsequent first data fetch`() {
+    fun `Test load failed to fully complete on the first attempt`() {
         normalRepo.currPokemons.tryEmit(
             mockPokemons.take(5).toPokemonEntities()
         )
@@ -86,7 +112,7 @@ class UpdatePokemonsFromRemoteUseCaseTest {
     }
 
     /**
-     * Test load failure
+     * Test load failure with error
      * - trigger errorUseCase invoke(true)
      * - Confirmed: status should be loading
      * - Confirmed: pokemon database should be empty
@@ -96,7 +122,7 @@ class UpdatePokemonsFromRemoteUseCaseTest {
      * - Confirmed: type database should be empty
      */
     @Test
-    fun `confirm data fetch error`() {
+    fun `test load failure with error`() {
         runTest {
             errorUseCase.invoke(true).test {
                 assertThat(awaitItem().isLoading()).isTrue()
@@ -114,5 +140,6 @@ class UpdatePokemonsFromRemoteUseCaseTest {
     fun tearDown() {
         normalRepo.clear()
         errorRepo.clear()
+        imagePreloader.clear()
     }
 }

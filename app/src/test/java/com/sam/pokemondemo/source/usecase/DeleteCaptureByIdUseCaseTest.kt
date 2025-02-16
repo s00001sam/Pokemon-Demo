@@ -29,9 +29,9 @@ class DeleteCaptureByIdUseCaseTest {
     /**
      * Test deletion a capture
      * - capture 1st Pokemon in the pokemon database
-     * - Confirmed: one item in the capture list
+     * - Confirmed: size of capture list should be 1
      * - trigger useCase invoke(1) to delete capture with id 1 from the capture database
-     * - Confirmed: no item in the capture list
+     * - Confirmed: capture list should be empty
      */
     @Test
     fun `test deletion a capture successful`() = runTest {
@@ -46,7 +46,7 @@ class DeleteCaptureByIdUseCaseTest {
             assertThat(awaitItem().size).isEqualTo(1)
 
             useCase.invoke(1)
-            assertThat(awaitItem().size).isEqualTo(0)
+            assertThat(awaitItem()).isEmpty()
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -55,9 +55,9 @@ class DeleteCaptureByIdUseCaseTest {
     /**
      * Test delete a capture that doesn't exist
      * - capture 1st Pokemon in the pokemon database
-     * - Confirmed: one item in the capture list
+     * - Confirmed: size of capture list should be 1
      * - trigger useCase invoke(2) to delete capture with id 2 from the capture database
-     * - Confirmed: one item in the capture list
+     * - Confirmed: size of capture list should be 1
      */
     @Test
     fun `test delete a capture that doesn't exist`() = runTest {

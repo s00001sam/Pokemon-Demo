@@ -30,7 +30,7 @@ class GetCapturedPokemonsUseCaseTest {
     /**
      * Test the capture list
      * - trigger useCase invoke()
-     * - Confirmed: database has at least one catchable Pokemon
+     * - Confirmed: database should have at least one catchable Pokemon
      * - Confirmed: initial capture count should be 0
      * - capture 1st Pokemon in the database
      * - Confirmed: capture count should be 1
@@ -66,7 +66,7 @@ class GetCapturedPokemonsUseCaseTest {
      * - capture 1st Pokemon in the database
      * - capture 1st Pokemon in the database again
      * - Confirmed: capture count should be 2
-     * - Confirmed: 1st and 2nd captures have the same id
+     * - Confirmed: 1st and 2nd captures should have the same id
      */
     @Test
     fun `confirm can capture the same pokemon`() = runTest {
@@ -102,7 +102,7 @@ class GetCapturedPokemonsUseCaseTest {
     /**
      * Test capture list is sorted by capture time (descending)
      * - trigger useCase invoke()
-     * - Confirmed: database has at least one catchable Pokemon
+     * - Confirmed: database should have at least one catchable Pokemon
      * - Confirmed: initial capture count should be 0
      * - capture 1st Pokemon in the database
      * - capture 1st Pokemon in the database again（due to the duplicate timestamps, a 1000ms offset is included）

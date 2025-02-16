@@ -30,7 +30,7 @@ class InsertCaptureUseCaseTest {
      * Test capture a pokemon
      * - Confirmed: no initial capture
      * - trigger useCase invoke() to capture 1st Pokemon in the database
-     * - Confirmed: one item in the capture list
+     * - Confirmed: size of capture list should be 1
      * - Confirmed: id of 1st capture should be 1
      */
     @Test
@@ -55,16 +55,16 @@ class InsertCaptureUseCaseTest {
 
     /**
      * Test capturing duplicate Pokemon
-     * - Confirmed: no initial capture
+     * - Confirmed: capture list should be empty
      * - trigger useCase invoke() to capture 1st Pokemon in the database
      * - trigger useCase invoke() to capture 1st Pokemon in the database again
-     * - Confirmed: two items in the capture list
-     * - Confirmed: 1st and 2nd captures have the same id
+     * - Confirmed: size of capture list should be 2
+     * - Confirmed: 1st and 2nd captures should have the same id
      */
     @Test
     fun `insert capture duplicate Pokemon`() = runTest {
         repo.currCaptures.test {
-            assertThat(awaitItem().size).isEqualTo(0)
+            assertThat(awaitItem()).isEmpty()
 
             val pokemons = repo.currPokemons.value
             val capture1 = CaptureEntity(

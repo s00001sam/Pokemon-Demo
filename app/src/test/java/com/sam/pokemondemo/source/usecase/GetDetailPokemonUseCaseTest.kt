@@ -3,6 +3,7 @@ package com.sam.pokemondemo.source.usecase
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.sam.pokemondemo.TestCoroutineRule
+import com.sam.pokemondemo.model.DetailDisplayPokemon
 import com.sam.pokemondemo.source.repo.FakeNormalRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -28,10 +29,11 @@ class GetDetailPokemonUseCaseTest {
     /**
      * Test get details of pokemon
      * - trigger useCase invoke(2) to get pokemon2 details
-     * - Confirmed: name of pokemon1 in the database should not be empty
+     * - Confirmed: name of pokemon1 in the database should be not empty
      * - Confirmed: evolvesFromName of pokemon2 in the database should be empty
      * - initialize details for pokemon2
      * - Confirmed: evolvesFromName of pokemon2 in the database should be not empty
+     * - Confirmed: return type should be DetailDisplayPokemon
      */
     @Test
     fun `test get details of pokemon`() = runTest {
@@ -43,6 +45,7 @@ class GetDetailPokemonUseCaseTest {
             repo.initDetailsData(2)
             val result2 = awaitItem()
             assertThat(result2.evolvesFromName).isNotEmpty()
+            assertThat(result2).isInstanceOf(DetailDisplayPokemon::class.java)
             cancelAndIgnoreRemainingEvents()
         }
     }

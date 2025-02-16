@@ -3,6 +3,7 @@ package com.sam.pokemondemo.source.usecase
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.sam.pokemondemo.TestCoroutineRule
+import com.sam.pokemondemo.model.DisplayTypeWithPokemons
 import com.sam.pokemondemo.source.repo.FakeNormalRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -31,6 +32,7 @@ class GetTypeWithPokemonsUseCaseTest {
      * - Confirmed: typeWithPokemons list should be empty
      * - insert all basic data to the database
      * - Confirmed: size of typeWithPokemons list should be 4
+     * - Confirmed: item type should be DisplayTypeWithPokemons
      */
     @Test
     fun `test get details of pokemon`() = runTest {
@@ -44,6 +46,8 @@ class GetTypeWithPokemonsUseCaseTest {
 
             val result2 = awaitItem()
             assertThat(result2.size).isEqualTo(4)
+            assertThat(result2[0]).isInstanceOf(DisplayTypeWithPokemons::class.java)
+
             cancelAndIgnoreRemainingEvents()
         }
     }

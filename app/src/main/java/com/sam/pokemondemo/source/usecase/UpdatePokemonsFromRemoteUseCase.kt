@@ -3,6 +3,7 @@ package com.sam.pokemondemo.source.usecase
 import com.sam.pokemondemo.handleResponseError
 import com.sam.pokemondemo.model.State
 import com.sam.pokemondemo.source.apiservice.PokemonApiService.Companion.DEFAULT_GET_POKEMONS_URL
+import com.sam.pokemondemo.source.imagepreloader.ImagePreloader
 import com.sam.pokemondemo.source.repo.BaseRepository
 import com.sam.pokemondemo.source.room.entity.BasicPokemonInfos.Companion.getBasicPokemonInfos
 import com.sam.pokemondemo.source.room.entity.TypeEntity.Companion.toTypeEntities
@@ -21,6 +22,7 @@ import javax.inject.Inject
 
 class UpdatePokemonsFromRemoteUseCase @Inject constructor(
     private val repo: BaseRepository,
+    private val imagePreloader: ImagePreloader,
 ) {
     /**
      * @param isFirstTimeLoadFinished If the first load is not finished, proceed with the process
@@ -65,8 +67,10 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
                         val refs = remotePokemon.toTypePokemonCrossRefs()
                         val types = remotePokemon.flatMap { it.types.toTypeEntities() }
 
-                        // Store this batch of data in the database
                         withContext(Dispatchers.IO) {
+                            // Preload All Images for cache
+                            imagePreloader.load(basicInfos.map { it.imageUrl })
+                            // Store this batch of data in the database
                             repo.upsertBasicPokemonsAndTypes(
                                 basicInfos = basicInfos,
                                 refs = refs,
