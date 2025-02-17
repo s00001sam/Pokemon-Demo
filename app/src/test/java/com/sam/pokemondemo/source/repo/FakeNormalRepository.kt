@@ -191,8 +191,6 @@ class FakeNormalRepository : BaseRepository {
                     type = type,
                     pokemons = filterPokemons,
                 )
-            }.also {
-                println("sam00 $it")
             }
         }
     }

@@ -185,7 +185,7 @@ fun HomeContent(
 
         // Empty
         if (isEmptyVisible) item {
-            EmptyView(
+            HomeEmptyView(
                 modifier = Modifier
                     .fillMaxWidth(),
                 onRetryClicked = onRetryClicked,
@@ -195,7 +195,7 @@ fun HomeContent(
 }
 
 @Composable
-fun EmptyView(
+fun HomeEmptyView(
     modifier: Modifier = Modifier,
     onRetryClicked: () -> Unit = {},
 ) {
@@ -246,13 +246,15 @@ fun TypeWithPokemonsItemView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 8.dp, end = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
         ) {
             Text(
                 modifier = Modifier
                     .weight(1f),
                 text = typeName,
                 style = MaterialTheme.typography.headline1,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
 
             Spacer(
@@ -359,6 +361,7 @@ fun HomePokemonItemView(
     ) {
         Column(
             modifier = Modifier
+                .width(100.dp)
                 .padding(start = 8.dp, top = 16.dp, end = 8.dp, bottom = 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

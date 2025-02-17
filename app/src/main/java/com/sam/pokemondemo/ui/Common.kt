@@ -1,5 +1,6 @@
 package com.sam.pokemondemo.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,7 +32,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -79,12 +83,23 @@ fun MyImage(
         contentDescription = contentDescription,
         contentScale = ContentScale.Fit,
         loading = {
-            LoadingIndicator(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0.2f),
-                size = 16.dp,
-            )
+            when (LocalInspectionMode.current) {
+                true -> {
+                    Image(
+                        painter = painterResource(R.drawable.mock_image),
+                        contentDescription = null,
+                    )
+                }
+
+                false -> {
+                    LoadingIndicator(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .alpha(0.2f),
+                        size = 16.dp,
+                    )
+                }
+            }
         },
         error = {
             Box(
@@ -123,6 +138,7 @@ fun MyTag(
 
     Box(
         modifier = modifier
+            .wrapContentSize()
             .background(
                 color = colorResource(R.color.bg_tag),
                 shape = backgroundShape,
@@ -164,6 +180,8 @@ fun MyPullToRefreshBox(
             modifier = Modifier.align(Alignment.TopCenter),
             refreshing = isRefreshing,
             state = refreshState,
+            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         )
     }
 }

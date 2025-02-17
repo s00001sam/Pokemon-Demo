@@ -145,7 +145,7 @@ fun DetailTopBar(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     pokemon: DetailDisplayPokemon?,
     onEvolveClicked: (id: Int) -> Unit = {},
 ) {
