@@ -158,6 +158,7 @@ fun HomeContent(
                 typeName = stringResource(R.string.my_pocket_title),
                 pokemons = capturedPokemons,
                 isBottomLineVisible = true,
+                isTitleClickEnable = true,
                 onPokemonClicked = toDetail,
                 onCaptureClicked = onCapturedRemoved,
             )
@@ -234,9 +235,11 @@ fun TypeWithPokemonsItemView(
     typeName: String,
     pokemons: List<DisplayPokemon>,
     isBottomLineVisible: Boolean = false,
+    isTitleClickEnable: Boolean = false,
     onPokemonClicked: (DisplayPokemon) -> Unit = {},
     onCaptureClicked: (DisplayPokemon) -> Unit = {},
 ) {
+    var isExpanded by remember { mutableStateOf(true) }
     val isEmpty = pokemons.isEmpty()
 
     Column(
@@ -245,7 +248,13 @@ fun TypeWithPokemonsItemView(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, top = 8.dp, end = 16.dp),
+                .clickable(
+                    enabled = isTitleClickEnable,
+                    onClick = {
+                        isExpanded = !isExpanded
+                    }
+                )
+                .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
             verticalAlignment = Alignment.Top,
         ) {
             Text(
@@ -268,9 +277,7 @@ fun TypeWithPokemonsItemView(
             )
         }
 
-        Spacer(Modifier.size(8.dp))
-
-        Box(
+        if (isExpanded) Box(
             modifier = Modifier
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center,
