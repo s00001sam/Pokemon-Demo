@@ -239,7 +239,7 @@ fun TypeWithPokemonsItemView(
     onPokemonClicked: (DisplayPokemon) -> Unit = {},
     onCaptureClicked: (DisplayPokemon) -> Unit = {},
 ) {
-    var isExpanded by remember { mutableStateOf(true) }
+    var isExpanded by rememberSaveable { mutableStateOf(true) }
     val isEmpty = pokemons.isEmpty()
 
     Column(
