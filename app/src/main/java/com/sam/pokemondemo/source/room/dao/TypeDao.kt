@@ -17,4 +17,7 @@ interface TypeDao {
     @Transaction
     @Query("SELECT * FROM type")
     fun getTypeWithPokemons(): Flow<List<TypeWithPokemons>>
+
+    @Query("DELETE FROM type")
+    suspend fun clear()
 }

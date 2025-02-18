@@ -84,4 +84,12 @@ class LocalDataSource @Inject constructor(
     override fun getLocalDetailWithTypes(pokemonId: Int): Flow<DetailPokemonWithTypes> {
         return db.pokemonDao().getDetailWithTypes(pokemonId)
     }
+
+    override suspend fun clearLocalDataWithoutCapture() {
+        db.withTransaction {
+            db.pokemonDao().clear()
+            db.typeDao().clear()
+            db.refDao().clear()
+        }
+    }
 }

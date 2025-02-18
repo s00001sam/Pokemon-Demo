@@ -74,4 +74,8 @@ class RemoteDataSource @Inject constructor(
     override fun getLocalDetailWithTypes(pokemonId: Int): Flow<DetailPokemonWithTypes> {
         TODO("Not yet implemented")
     }
+
+    override suspend fun clearLocalDataWithoutCapture() {
+        TODO("Not yet implemented")
+    }
 }

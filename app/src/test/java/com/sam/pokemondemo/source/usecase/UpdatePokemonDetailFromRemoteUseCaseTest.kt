@@ -142,6 +142,6 @@ class UpdatePokemonDetailFromRemoteUseCaseTest {
     fun tearDown() {
         normalRepo.clear()
         errorRepo.clear()
-        imagePreloader.clear()
+        imagePreloader.clearFakeData()
     }
 }

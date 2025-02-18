@@ -24,11 +24,8 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
     private val repo: BaseRepository,
     private val imagePreloader: ImagePreloader,
 ) {
-    /**
-     * @param isFirstTimeLoadFinished If the first load is not finished, proceed with the process
-     */
     fun invoke(
-        isFirstTimeLoadFinished: Boolean,
+        isRefresh: Boolean,
     ): Flow<State<Any>> = flow {
         runCatching {
             val remoteBasicResults = withContext(Dispatchers.IO) {
@@ -38,12 +35,17 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
             }
 
             /**
+             * If refresh, need clear database
+             */
+            if (isRefresh) {
+                repo.clearLocalDataWithoutCapture()
+                imagePreloader.clear()
+            }
+
+            /**
              * If the initial load is incomplete, need to know what has already been loaded
              */
-            val firstTimeLoadedNames: List<String> = when (isFirstTimeLoadFinished) {
-                true -> emptyList()
-                false -> repo.getLocalPokemonNames()
-            }
+            val prevLoadedNames = repo.getLocalPokemonNames()
 
             remoteBasicResults.chunked(BATCH_SIZE).forEach { batchResults ->
                 supervisorScope {
@@ -51,7 +53,7 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
                         async(Dispatchers.IO) {
                             runCatching {
                                 if (result.url == null || result.name == null) return@async null
-                                if (firstTimeLoadedNames.contains(result.name)) return@async null
+                                if (prevLoadedNames.contains(result.name)) return@async null
 
                                 repo.getRemotePokemon(url = result.url).also {
                                     it.handleResponseError()

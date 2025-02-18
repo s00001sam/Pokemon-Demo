@@ -114,7 +114,7 @@ fun HomeScreen(
             isRefreshing = isLoading,
             onRefresh = {
                 viewModel.resetErrorMessage()
-                viewModel.updatePokemonsFromRemote()
+                viewModel.updatePokemonsFromRemote(true)
             },
         ) {
             HomeContent(
@@ -137,7 +137,7 @@ fun HomeScreen(
                     navController.navigate(route = Detail(pokemon.pokemonId))
                 },
                 onRetryClicked = {
-                    viewModel.updatePokemonsFromRemote()
+                    viewModel.updatePokemonsFromRemote(true)
                 }
             )
         }

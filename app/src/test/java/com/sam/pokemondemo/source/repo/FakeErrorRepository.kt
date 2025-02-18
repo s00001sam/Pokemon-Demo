@@ -221,4 +221,10 @@ class FakeErrorRepository : BaseRepository {
             )
         }
     }
+
+    override suspend fun clearLocalDataWithoutCapture() {
+        currPokemons.tryEmit(emptyList())
+        currTypes.tryEmit(emptyList())
+        currTypePokemonCrossRefs.tryEmit(emptyList())
+    }
 }

@@ -77,4 +77,8 @@ class PokemonRepository @Inject constructor(
     override fun getLocalDetailWithTypes(pokemonId: Int): Flow<DetailPokemonWithTypes> {
         return localDataSource.getLocalDetailWithTypes(pokemonId)
     }
+
+    override suspend fun clearLocalDataWithoutCapture() {
+        localDataSource.clearLocalDataWithoutCapture()
+    }
 }

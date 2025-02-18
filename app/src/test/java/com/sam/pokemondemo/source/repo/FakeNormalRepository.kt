@@ -294,4 +294,11 @@ class FakeNormalRepository : BaseRepository {
             )
         }
     }
+
+    override suspend fun clearLocalDataWithoutCapture() {
+        currPokemons.tryEmit(emptyList())
+        currTypes.tryEmit(emptyList())
+        currTypePokemonCrossRefs.tryEmit(emptyList())
+        pokemonsGotFromRemote.clear()
+    }
 }

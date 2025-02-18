@@ -13,4 +13,7 @@ interface ImageCacheDao {
 
     @Query("SELECT imageUrl FROM imageCache")
     suspend fun getCacheList(): List<String>
+
+    @Query("DELETE FROM imageCache")
+    suspend fun clear()
 }

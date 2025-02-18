@@ -37,4 +37,5 @@ interface BaseRepository {
     )
 
     fun getLocalDetailWithTypes(pokemonId: Int): Flow<DetailPokemonWithTypes>
+    suspend fun clearLocalDataWithoutCapture()
 }

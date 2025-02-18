@@ -13,4 +13,7 @@ interface RefDao {
 
     @Query("DELETE FROM typePokemonCrossRef WHERE pokemonId = :pokemonId")
     suspend fun deleteRef(pokemonId: Int)
+
+    @Query("DELETE FROM typePokemonCrossRef")
+    suspend fun clear()
 }

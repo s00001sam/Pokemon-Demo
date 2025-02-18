@@ -30,6 +30,7 @@
 - 每次 Cache 圖片成功會存入 imageCache 表，代表圖片有下載成功
 - 未在 imageCache 裡的圖片，才會進行下載
 - 列表頁面第一次成功取得所有 Pokemon 基本資料及 Type 後，之後再進入 APP 就不會主動呼叫 API，除非使用者刷新
+- 使用者刷新列表頁面，會清除資料庫資料（pokemon、type、typePokemonCrossRef、imageCache），重新呼叫 API 存入資料庫
 - Pokemon 詳細資料，會在進入詳細頁面，才進行請求及儲存
 
 API

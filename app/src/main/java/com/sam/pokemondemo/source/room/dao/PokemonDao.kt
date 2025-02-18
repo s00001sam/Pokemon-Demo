@@ -29,4 +29,7 @@ interface PokemonDao {
 
     @Query("SELECT * FROM detail_pokemon_view WHERE pokemonId = :pokemonId")
     fun getDetailWithTypes(pokemonId: Int): Flow<DetailPokemonWithTypes>
+
+    @Query("DELETE FROM pokemon")
+    suspend fun clear()
 }

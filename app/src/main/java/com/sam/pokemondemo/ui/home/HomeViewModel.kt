@@ -47,26 +47,25 @@ class HomeViewModel @Inject constructor(
     private val _capturedPokemons = MutableStateFlow<List<DisplayPokemon>>(emptyList())
     val capturedPokemons = _capturedPokemons.asStateFlow()
 
-    private val isForceTriggeredUpdate = MutableSharedFlow<Unit>()
+    private val refreshTrigger = MutableSharedFlow<Boolean>()
 
     init {
         collectUpdatePokemonsState()
         collectTypeWithPokemons()
         collectCapturedPokemons()
 
-        // "First time here" or "First time unfinished"
-        if (!spRepository.isEverLoad || !spRepository.isFirstTimeLoadFinished) {
-            spRepository.isFirstTimeLoadFinished = false
-            updatePokemonsFromRemote()
+        // load unfinished last time
+        if (!spRepository.isLoadFinished) {
+            updatePokemonsFromRemote(false)
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun collectUpdatePokemonsState() {
         viewModelScope.launch {
-            isForceTriggeredUpdate
+            refreshTrigger
                 .flatMapLatest {
-                    updatePokemonsFromRemote.invoke(spRepository.isFirstTimeLoadFinished)
+                    updatePokemonsFromRemote.invoke(it)
                 }
                 .collectLatest { state ->
                     when {
@@ -81,7 +80,7 @@ class HomeViewModel @Inject constructor(
                         }
 
                         state.isSuccess() -> {
-                            spRepository.isFirstTimeLoadFinished = true
+                            spRepository.isLoadFinished = true
                             _isLoading.tryEmit(false)
                         }
                     }
@@ -97,10 +96,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updatePokemonsFromRemote() {
+    fun updatePokemonsFromRemote(isRefresh: Boolean) {
         if (isLoading.value) return
+        spRepository.isLoadFinished = false
         viewModelScope.launch(Dispatchers.IO) {
-            isForceTriggeredUpdate.emit(Unit)
+            this@HomeViewModel.refreshTrigger.emit(isRefresh)
         }
     }
 

@@ -9,16 +9,13 @@ import javax.inject.Singleton
 class SharedPreferenceRepository @Inject constructor(
     private val sharedPreference: SharedPreferences,
 ) {
-    val isEverLoad: Boolean
-        get() = sharedPreference.contains(KEY_FIRST_LOAD_FINISH)
-
-    var isFirstTimeLoadFinished: Boolean
-        get() = sharedPreference.getBoolean(KEY_FIRST_LOAD_FINISH, false)
+    var isLoadFinished: Boolean
+        get() = sharedPreference.getBoolean(KEY_LOAD_FINISH, false)
         set(value) {
-            sharedPreference.edit { putBoolean(KEY_FIRST_LOAD_FINISH, value) }
+            sharedPreference.edit { putBoolean(KEY_LOAD_FINISH, value) }
         }
 
     companion object {
-        const val KEY_FIRST_LOAD_FINISH = "KEY_FIRST_LOAD_FINISH"
+        const val KEY_LOAD_FINISH = "KEY_LOAD_FINISH"
     }
 }

@@ -1,6 +1,7 @@
 package com.sam.pokemondemo.source.imagepreloader
 
 import android.content.Context
+import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -37,5 +38,12 @@ class CoilImagePreloader @Inject constructor(
 
             context.imageLoader.enqueue(request)
         }
+    }
+
+    @OptIn(ExperimentalCoilApi::class)
+    override suspend fun clear() {
+        db.imageCacheDao().clear()
+        context.imageLoader.diskCache?.clear()
+        context.imageLoader.memoryCache?.clear()
     }
 }
