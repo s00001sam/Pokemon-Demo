@@ -73,6 +73,17 @@ fun HomeScreen(
     val typeWithPokemonsList by viewModel.typeWithPokemons.collectAsStateWithLifecycle(emptyList())
     var isEmptyVisible by rememberSaveable { mutableStateOf(false) }
 
+    // If initial data loading was not completed, may skip the preloading of some images
+    LaunchedEffect(typeWithPokemonsList, isLoading) {
+        if (isLoading) return@LaunchedEffect
+        val imageUrls = typeWithPokemonsList.flatMap {
+            it.pokemons.mapNotNull { pokemon ->
+                pokemon.imageUrl.takeIf { url -> url.isNotEmpty() }
+            }
+        }
+        viewModel.preloadImages(imageUrls)
+    }
+
     LaunchedEffect(isLoading) {
         if (isLoading) isEmptyVisible = false
     }

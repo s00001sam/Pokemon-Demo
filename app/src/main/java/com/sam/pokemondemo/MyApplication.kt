@@ -44,6 +44,7 @@ class MyApplication : Application(), ImageLoaderFactory {
             .diskCache {
                 DiskCache.Builder()
                     .directory(cacheDir.resolve(IMAGE_CACHE_DIR))
+                    .maxSizePercent(0.5)
                     .build()
             }
             .respectCacheHeaders(false)

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sam.pokemondemo.R
 import com.sam.pokemondemo.model.DisplayPokemon
 import com.sam.pokemondemo.model.DisplayTypeWithPokemons
+import com.sam.pokemondemo.source.imagepreloader.ImagePreloader
 import com.sam.pokemondemo.source.repo.SharedPreferenceRepository
 import com.sam.pokemondemo.source.room.entity.CaptureEntity
 import com.sam.pokemondemo.source.usecase.DeleteCaptureByIdUseCase
@@ -32,6 +33,7 @@ class HomeViewModel @Inject constructor(
     private val getCapturedPokemons: GetCapturedPokemonsUseCase,
     private val insertCapture: InsertCaptureUseCase,
     private val deleteCaptureById: DeleteCaptureByIdUseCase,
+    private val imagePreloader: ImagePreloader,
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -128,5 +130,11 @@ class HomeViewModel @Inject constructor(
 
     fun resetErrorMessage() {
         _errorMessageRes.tryEmit(null)
+    }
+
+    fun preloadImages(imageUrls: List<String>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            imagePreloader.load(imageUrls)
+        }
     }
 }

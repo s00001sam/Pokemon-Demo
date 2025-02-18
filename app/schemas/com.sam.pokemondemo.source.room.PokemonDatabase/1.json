@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8eec2f026e69529231f88c820e75a425",
+    "identityHash": "859a8f6536ea0f39abe007fd706e1def",
     "entities": [
       {
         "tableName": "pokemon",
@@ -128,6 +128,26 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "imageCache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`imageUrl` TEXT NOT NULL, PRIMARY KEY(`imageUrl`))",
+        "fields": [
+          {
+            "fieldPath": "imageUrl",
+            "columnName": "imageUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "imageUrl"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [
@@ -142,7 +162,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8eec2f026e69529231f88c820e75a425')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '859a8f6536ea0f39abe007fd706e1def')"
     ]
   }
 }
