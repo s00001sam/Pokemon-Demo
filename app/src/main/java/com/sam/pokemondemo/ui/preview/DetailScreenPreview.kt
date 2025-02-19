@@ -13,6 +13,7 @@ import com.sam.pokemondemo.ui.preview.model.BasicInfoSectionModel
 import com.sam.pokemondemo.ui.preview.model.EvolveSectionModel
 import com.sam.pokemondemo.ui.preview.provider.BasicInfoSectionModelProvider
 import com.sam.pokemondemo.ui.preview.provider.EvolveSectionModelProvider
+import com.sam.pokemondemo.ui.theme.PokemonDemoTheme
 
 @OptIn(ExperimentalLayoutApi::class)
 @Preview(
@@ -30,11 +31,13 @@ fun BasicInfoSectionPreview(
     @PreviewParameter(BasicInfoSectionModelProvider::class)
     model: BasicInfoSectionModel,
 ) {
-    BasicInfoSection(
-        modifier = Modifier
-            .fillMaxWidth(),
-        pokemon = model.pokemon,
-    )
+    PokemonDemoTheme {
+        BasicInfoSection(
+            modifier = Modifier
+                .fillMaxWidth(),
+            pokemon = model.pokemon,
+        )
+    }
 }
 
 @Preview(
@@ -52,11 +55,13 @@ fun EvolveSectionPreview(
     @PreviewParameter(EvolveSectionModelProvider::class)
     model: EvolveSectionModel,
 ) {
-    EvolveSection(
-        modifier = Modifier
-            .fillMaxWidth(),
-        evolvesFromId = model.evolvesFromId,
-        evolvesFromName = model.evolvesFromName,
-        evolvesFromImageUrl = model.evolvesFromImageUrl,
-    )
+    PokemonDemoTheme {
+        EvolveSection(
+            modifier = Modifier
+                .fillMaxWidth(),
+            evolvesFromId = model.evolvesFromId,
+            evolvesFromName = model.evolvesFromName,
+            evolvesFromImageUrl = model.evolvesFromImageUrl,
+        )
+    }
 }

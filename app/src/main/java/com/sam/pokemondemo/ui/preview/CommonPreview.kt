@@ -12,6 +12,7 @@ import com.sam.pokemondemo.ui.MyTag
 import com.sam.pokemondemo.ui.preview.model.BasicInfoSectionModel
 import com.sam.pokemondemo.ui.preview.provider.BasicInfoSectionModelProvider
 import com.sam.pokemondemo.ui.preview.provider.MyTagProvider
+import com.sam.pokemondemo.ui.theme.PokemonDemoTheme
 
 @Preview(
     widthDp = 320,
@@ -27,13 +28,15 @@ import com.sam.pokemondemo.ui.preview.provider.MyTagProvider
 fun MyImagePreview(
     @PreviewParameter(BasicInfoSectionModelProvider::class) model: BasicInfoSectionModel,
 ) {
-    MyImage(
-        modifier = Modifier
-            .size(100.dp),
-        url = "",
-        size = 100.dp,
-        contentDescription = null,
-    )
+    PokemonDemoTheme {
+        MyImage(
+            modifier = Modifier
+                .size(100.dp),
+            url = "",
+            size = 100.dp,
+            contentDescription = null,
+        )
+    }
 }
 
 @Preview(
@@ -50,7 +53,9 @@ fun MyImagePreview(
 fun MyTagPreview(
     @PreviewParameter(MyTagProvider::class) tagName: String,
 ) {
-    MyTag(
-        tagName = tagName,
-    )
+    PokemonDemoTheme {
+        MyTag(
+            tagName = tagName,
+        )
+    }
 }
