@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,7 +27,7 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
         isRefresh: Boolean,
     ): Flow<State<Any>> = flow {
         runCatching {
-            val remoteBasicResults = withContext(Dispatchers.IO) {
+            val remoteBasicResults = run {
                 val response = repo.getRemoteBasicPokemons(DEFAULT_GET_POKEMONS_URL)
                 response.handleResponseError()
                 response.body()?.results.orEmpty()
@@ -69,16 +68,14 @@ class UpdatePokemonsFromRemoteUseCase @Inject constructor(
                         val refs = remotePokemon.toTypePokemonCrossRefs()
                         val types = remotePokemon.flatMap { it.types.toTypeEntities() }
 
-                        withContext(Dispatchers.IO) {
-                            // Preload All Images for cache
-                            imagePreloader.load(basicInfos.map { it.imageUrl })
-                            // Store this batch of data in the database
-                            repo.upsertBasicPokemonsAndTypes(
-                                basicInfos = basicInfos,
-                                refs = refs,
-                                types = types,
-                            )
-                        }
+                        // Preload All Images for cache
+                        imagePreloader.load(basicInfos.map { it.imageUrl })
+                        // Store this batch of data in the database
+                        repo.upsertBasicPokemonsAndTypes(
+                            basicInfos = basicInfos,
+                            refs = refs,
+                            types = types,
+                        )
                     }
             }
 

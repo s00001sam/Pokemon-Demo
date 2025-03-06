@@ -7,14 +7,11 @@ import com.sam.pokemondemo.source.repo.BaseRepository
 import com.sam.pokemondemo.source.room.entity.PokemonEntity
 import com.sam.pokemondemo.source.room.entity.TypeEntity.Companion.toTypeEntities
 import com.sam.pokemondemo.source.room.entity.TypePokemonCrossRef
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,16 +21,13 @@ class UpdatePokemonDetailFromRemoteUseCase @Inject constructor(
 ) {
     fun invoke(pokemonId: Int): Flow<State<Any>> = flow {
         runCatching {
-            val basicRemotePokemon = CoroutineScope(Dispatchers.IO).async {
-                repo.getRemotePokemon(pokemonId).also {
-                    it.handleResponseError()
-                }
-            }.await().body()
-            val species = CoroutineScope(Dispatchers.IO).async {
-                repo.getRemotePokemonSpecies(pokemonId).also {
-                    it.handleResponseError()
-                }
-            }.await().body()
+            val basicRemotePokemon = repo.getRemotePokemon(pokemonId).also {
+                it.handleResponseError()
+            }.body()
+            val species = repo.getRemotePokemonSpecies(pokemonId).also {
+                it.handleResponseError()
+            }.body()
+
             val pokemon = PokemonEntity(
                 id = basicRemotePokemon?.id ?: 0,
                 name = basicRemotePokemon?.name.orEmpty(),
@@ -47,12 +41,10 @@ class UpdatePokemonDetailFromRemoteUseCase @Inject constructor(
                 TypePokemonCrossRef(typeName = type.name, pokemonId = id)
             }
 
-            withContext(Dispatchers.IO) {
-                // Preload image
-                imagePreloader.load(listOf(pokemon.imageUrl))
-                // Store details in the database
-                repo.updateDetails(pokemon, refs, types)
-            }
+            // Preload image
+            imagePreloader.load(listOf(pokemon.imageUrl))
+            // Store details in the database
+            repo.updateDetails(pokemon, refs, types)
 
             emit(State.Success(data = Any()))
         }.onFailure {
