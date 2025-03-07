@@ -3,9 +3,8 @@ package com.sam.pokemondemo.source.repo
 import com.sam.pokemondemo.model.BasicPokemonsResponse
 import com.sam.pokemondemo.model.PokemonSpeciesResponse
 import com.sam.pokemondemo.model.RemotePokemonResponse
-import com.sam.pokemondemo.source.datasource.BaseDataSource
-import com.sam.pokemondemo.source.hilt.LocalData
-import com.sam.pokemondemo.source.hilt.RemoteData
+import com.sam.pokemondemo.source.datasource.LocalDataSource
+import com.sam.pokemondemo.source.datasource.RemoteDataSource
 import com.sam.pokemondemo.source.room.entity.BasicPokemonInfos
 import com.sam.pokemondemo.source.room.entity.CaptureEntity
 import com.sam.pokemondemo.source.room.entity.CapturedPokemonView
@@ -21,8 +20,8 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class PokemonRepository @Inject constructor(
-    @LocalData private val localDataSource: BaseDataSource,
-    @RemoteData private val remoteDataSource: BaseDataSource,
+    private val localDataSource: LocalDataSource,
+    private val remoteDataSource: RemoteDataSource,
 ) : BaseRepository {
     override suspend fun getRemoteBasicPokemons(url: String): Response<BasicPokemonsResponse> {
         return withContext(Dispatchers.IO) {

@@ -6,7 +6,6 @@ import androidx.room.Room
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.sam.pokemondemo.BuildConfig
 import com.sam.pokemondemo.source.apiservice.PokemonApiService
-import com.sam.pokemondemo.source.datasource.BaseDataSource
 import com.sam.pokemondemo.source.datasource.LocalDataSource
 import com.sam.pokemondemo.source.datasource.RemoteDataSource
 import com.sam.pokemondemo.source.room.PokemonDatabase
@@ -56,18 +55,12 @@ class SourceModule {
     )
 
     @Singleton
-    @LocalData
     @Provides
-    fun providerLocalDataSource(db: PokemonDatabase): BaseDataSource {
-        return LocalDataSource(db)
-    }
+    fun providerLocalDataSource(db: PokemonDatabase) = LocalDataSource(db)
 
     @Singleton
-    @RemoteData
     @Provides
-    fun providerRemoteDataSource(apiService: PokemonApiService): BaseDataSource {
-        return RemoteDataSource(apiService)
-    }
+    fun providerRemoteDataSource(apiService: PokemonApiService) = RemoteDataSource(apiService)
 
     @Singleton
     @Provides
