@@ -5,6 +5,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.sam.pokemondemo.source.hilt.ApplicationScope
 import com.sam.pokemondemo.source.room.PokemonDatabase
 import com.sam.pokemondemo.source.room.entity.ImageCacheEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class CoilImagePreloader @Inject constructor(
     @ApplicationContext private val context: Context,
     private val db: PokemonDatabase,
+    @ApplicationScope val appCoroutineScope: CoroutineScope,
 ) : ImagePreloader {
     override suspend fun load(imageUrls: List<String>) {
         val imageCacheDao = db.imageCacheDao()
@@ -29,7 +31,7 @@ class CoilImagePreloader @Inject constructor(
                 .diskCachePolicy(CachePolicy.ENABLED)
                 .listener(
                     onSuccess = { _, _ ->
-                        CoroutineScope(Dispatchers.IO).launch {
+                        appCoroutineScope.launch(Dispatchers.IO) {
                             db.imageCacheDao().insertOne(ImageCacheEntity(url))
                         }
                     }
