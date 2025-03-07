@@ -1,8 +1,6 @@
 package com.sam.pokemondemo.source.room
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.sam.pokemondemo.source.room.dao.CaptureDao
@@ -38,23 +36,4 @@ abstract class PokemonDatabase : RoomDatabase() {
     abstract fun refDao(): RefDao
     abstract fun captureDao(): CaptureDao
     abstract fun imageCacheDao(): ImageCacheDao
-
-    companion object {
-        @Volatile
-        private var instance: PokemonDatabase? = null
-        private val LOCK = Any()
-        private const val DATABASE_NAME = "pokemon_database"
-
-        fun getInstance(context: Context) = instance ?: synchronized(LOCK) {
-            instance ?: buildDatabase(context).also {
-                instance = it
-            }
-        }
-
-        private fun buildDatabase(context: Context) = Room.databaseBuilder(
-            context.applicationContext,
-            PokemonDatabase::class.java,
-            DATABASE_NAME,
-        ).fallbackToDestructiveMigration().build()
-    }
 }

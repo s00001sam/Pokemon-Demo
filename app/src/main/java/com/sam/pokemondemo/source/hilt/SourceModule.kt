@@ -2,6 +2,7 @@ package com.sam.pokemondemo.source.hilt
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.room.Room
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.sam.pokemondemo.BuildConfig
 import com.sam.pokemondemo.source.apiservice.PokemonApiService
@@ -70,7 +71,11 @@ class SourceModule {
 
     @Singleton
     @Provides
-    fun provideRoomDB(@ApplicationContext context: Context) = PokemonDatabase.getInstance(context)
+    fun provideRoomDB(@ApplicationContext context: Context) = Room.databaseBuilder(
+        context = context,
+        klass = PokemonDatabase::class.java,
+        name = DATABASE_NAME,
+    ).fallbackToDestructiveMigration().build()
 
     @Provides
     fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences {
@@ -80,5 +85,6 @@ class SourceModule {
     companion object {
         private const val BASE_URL = "https://pokeapi.co/api/v2/"
         private const val NAME_DEFAULT = BuildConfig.APPLICATION_ID
+        private const val DATABASE_NAME = "pokemon_database"
     }
 }
