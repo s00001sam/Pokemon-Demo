@@ -72,6 +72,7 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.truth.test)
     testImplementation(libs.turbine.test)
+    testImplementation(libs.mockk.test)
 
     // gemini ai
     implementation(libs.gemini)

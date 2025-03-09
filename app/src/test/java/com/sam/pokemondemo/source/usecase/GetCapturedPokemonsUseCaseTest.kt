@@ -1,148 +1,62 @@
 package com.sam.pokemondemo.source.usecase
 
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.sam.pokemondemo.TestCoroutineRule
-import com.sam.pokemondemo.model.CapturedDisplayPokemon
-import com.sam.pokemondemo.source.repo.FakeNormalRepository
-import com.sam.pokemondemo.source.room.entity.CaptureEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.sam.pokemondemo.source.repo.BaseRepository
+import com.sam.pokemondemo.source.room.entity.CapturedPokemonView
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.unmockkAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class GetCapturedPokemonsUseCaseTest {
-    @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
-
-    private lateinit var repo: FakeNormalRepository
+    private lateinit var repo: BaseRepository
     private lateinit var useCase: GetCapturedPokemonsUseCase
 
     @Before
     fun setup() {
-        repo = FakeNormalRepository().apply { initAllBasicData() }
+        repo = mockk<BaseRepository>(relaxed = true)
         useCase = GetCapturedPokemonsUseCase(repo)
     }
 
     /**
-     * Test the capture list
+     * Test call method in repo
+     * - mock repo.getLocalCapturedPokemonsByTimeDesc() output
      * - trigger useCase invoke()
-     * - Confirmed: database should have at least one catchable Pokemon
-     * - Confirmed: initial capture count should be 0
-     * - capture 1st Pokemon in the database
-     * - Confirmed: capture count should be 1
-     * - Confirmed: return type in list should be CapturedDisplayPokemon
+     * - Confirmed: check if calls method getLocalCapturedPokemonsByTimeDesc in repo
+     * - Confirmed: the output data (size)
+     * - Confirmed: the output data (captureId)
+     * - Confirmed: the output data (pokemonId)
+     * - Confirmed: the output data (name)
      */
     @Test
-    fun `confirmed capture list is correct`() = runTest {
-        useCase.invoke().test {
-            assertThat(repo.currPokemons.value.size).isGreaterThan(1)
+    fun `test call method getLocalCapturedPokemonsByTimeDesc in repo`() = runTest {
+        val capturedPokemons = listOf(
+            CapturedPokemonView(
+                id = 0,
+                pokemonId = 1,
+                name = "pokemon1",
+                capturedTime = System.currentTimeMillis(),
+            ),
+        )
+        every { repo.getLocalCapturedPokemonsByTimeDesc() } returns flowOf(capturedPokemons)
 
-            assertThat(awaitItem().size).isEqualTo(0)
+        val result = useCase.invoke().first()
 
-            repo.insertCapture(
-                CaptureEntity(
-                    id = 1,
-                    pokemonId = repo.currPokemons.value[0].id,
-                    capturedTime = System.currentTimeMillis(),
-                ),
-            )
-            val result = awaitItem()
-            assertThat(result.size).isEqualTo(1)
-            assertThat(result[0]).isInstanceOf(CapturedDisplayPokemon::class.java)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    /**
-     * Test capturing duplicate Pokemon
-     * - trigger useCase invoke()
-     * - Confirmed: database has at least one catchable Pokemon
-     * - Confirmed: initial capture count should be 0
-     * - capture 1st Pokemon in the database
-     * - capture 1st Pokemon in the database again
-     * - Confirmed: capture count should be 2
-     * - Confirmed: 1st and 2nd captures should have the same id
-     */
-    @Test
-    fun `confirm can capture the same pokemon`() = runTest {
-        useCase.invoke().test {
-            assertThat(repo.currPokemons.value.size).isGreaterThan(1)
-
-            assertThat(awaitItem().size).isEqualTo(0)
-
-            repo.insertCapture(
-                CaptureEntity(
-                    id = 1,
-                    pokemonId = repo.currPokemons.value[0].id,
-                    capturedTime = System.currentTimeMillis(),
-                ),
-            )
-            awaitItem()
-
-            repo.insertCapture(
-                CaptureEntity(
-                    id = 2,
-                    pokemonId = repo.currPokemons.value[0].id,
-                    capturedTime = System.currentTimeMillis(),
-                ),
-            )
-            val result = awaitItem()
-            assertThat(result.size).isEqualTo(2)
-            assertThat(result[0].pokemonId).isEqualTo(result[1].pokemonId)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    /**
-     * Test capture list is sorted by capture time (descending)
-     * - trigger useCase invoke()
-     * - Confirmed: database should have at least one catchable Pokemon
-     * - Confirmed: initial capture count should be 0
-     * - capture 1st Pokemon in the database
-     * - capture 1st Pokemon in the database again（due to the duplicate timestamps, a 1000ms offset is included）
-     * - Confirmed: capture count should be 2
-     * - Confirmed: 1st captureTime should be greater than the 2nd
-     */
-    @Test
-    fun `confirm capture list sort by captureTime DESC`() = runTest {
-        useCase.invoke().test {
-            assertThat(repo.currPokemons.value.size).isGreaterThan(1)
-
-            assertThat(awaitItem().size).isEqualTo(0)
-
-            repo.insertCapture(
-                CaptureEntity(
-                    id = 1,
-                    pokemonId = repo.currPokemons.value[0].id,
-                    capturedTime = System.currentTimeMillis(),
-                ),
-            )
-            awaitItem()
-
-            repo.insertCapture(
-                CaptureEntity(
-                    id = 2,
-                    pokemonId = repo.currPokemons.value[0].id,
-                    capturedTime = System.currentTimeMillis() + 1000L,
-                ),
-            )
-            val result = awaitItem()
-            println(result)
-            assertThat(result.size).isEqualTo(2)
-            assertThat(result[0].capturedTime).isGreaterThan(result[1].capturedTime)
-
-            cancelAndIgnoreRemainingEvents()
-        }
+        coVerify { repo.getLocalCapturedPokemonsByTimeDesc() }
+        assertThat(result.size).isEqualTo(1)
+        assertThat(result[0].captureId).isEqualTo(capturedPokemons[0].id)
+        assertThat(result[0].pokemonId).isEqualTo(capturedPokemons[0].pokemonId)
+        assertThat(result[0].name).isEqualTo(capturedPokemons[0].name)
     }
 
     @After
     fun tearDown() {
-        repo.clear()
+        unmockkAll()
     }
 }
