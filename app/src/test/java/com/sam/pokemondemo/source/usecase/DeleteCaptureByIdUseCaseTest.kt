@@ -25,7 +25,7 @@ class DeleteCaptureByIdUseCaseTest {
      * - Confirmed: check if calls method deleteCaptureById in repo
      */
     @Test
-    fun `test call method deleteCaptureById in repo`() = runTest {
+    fun test_call_method_deleteCaptureById_in_repo() = runTest {
         useCase.invoke(1)
         coVerify { repo.deleteCaptureById(1) }
     }

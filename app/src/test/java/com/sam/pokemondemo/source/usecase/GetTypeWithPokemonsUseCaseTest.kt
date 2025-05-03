@@ -37,7 +37,7 @@ class GetTypeWithPokemonsUseCaseTest {
      * - Confirmed: the output data (first pokemon name)
      */
     @Test
-    fun `test call method getLocalTypeWithPokemons in repo`() = runTest {
+    fun test_call_method_getLocalTypeWithPokemonsin_repo() = runTest {
         val typeWithPokemons = listOf(
             TypeWithPokemons(
                 type = TypeEntity("type1"),

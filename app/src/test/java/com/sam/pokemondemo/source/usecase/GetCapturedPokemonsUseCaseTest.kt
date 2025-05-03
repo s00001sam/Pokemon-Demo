@@ -35,7 +35,7 @@ class GetCapturedPokemonsUseCaseTest {
      * - Confirmed: the output data (name)
      */
     @Test
-    fun `test call method getLocalCapturedPokemonsByTimeDesc in repo`() = runTest {
+    fun test_call_method_getLocalCapturedPokemonsByTimeDesc_in_repo() = runTest {
         val capturedPokemons = listOf(
             CapturedPokemonView(
                 id = 0,

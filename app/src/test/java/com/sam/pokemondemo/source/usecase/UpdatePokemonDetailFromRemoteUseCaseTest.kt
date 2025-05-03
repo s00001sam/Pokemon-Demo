@@ -3,145 +3,118 @@ package com.sam.pokemondemo.source.usecase
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.sam.pokemondemo.TestCoroutineRule
-import com.sam.pokemondemo.source.imagepreloader.FakeImagePreloader
-import com.sam.pokemondemo.source.repo.FakeErrorRepository
-import com.sam.pokemondemo.source.repo.FakeNormalRepository
+import com.sam.pokemondemo.source.imagepreloader.ImagePreloader
+import com.sam.pokemondemo.source.mockPokemon1Image
+import com.sam.pokemondemo.source.mockPokemon1Name
+import com.sam.pokemondemo.source.mockPokemon1SpeciesResponseForDetail
+import com.sam.pokemondemo.source.mockRemotePokemonResponseForDetail
+import com.sam.pokemondemo.source.repo.BaseRepository
+import com.sam.pokemondemo.source.room.entity.PokemonEntity
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
+import io.mockk.slot
+import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Response
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UpdatePokemonDetailFromRemoteUseCaseTest {
     @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
+    private val testCoroutineRule = TestCoroutineRule()
 
-    private lateinit var normalRepo: FakeNormalRepository
-    private lateinit var errorRepo: FakeErrorRepository
-    private lateinit var imagePreloader: FakeImagePreloader
-    private lateinit var normalUseCase: UpdatePokemonDetailFromRemoteUseCase
-    private lateinit var errorUseCase: UpdatePokemonDetailFromRemoteUseCase
+    private lateinit var repo: BaseRepository
+
+    private lateinit var imagePreloader: ImagePreloader
+
+    private lateinit var useCase: UpdatePokemonDetailFromRemoteUseCase
 
     @Before
     fun setup() {
-        normalRepo = FakeNormalRepository().apply { initAllBasicData() }
-        errorRepo = FakeErrorRepository().apply { initAllBasicData() }
-        imagePreloader = FakeImagePreloader()
-        normalUseCase = UpdatePokemonDetailFromRemoteUseCase(normalRepo, imagePreloader)
-        errorUseCase = UpdatePokemonDetailFromRemoteUseCase(errorRepo, imagePreloader)
+        repo = mockk<BaseRepository>(relaxed = true)
+        imagePreloader = mockk<ImagePreloader>(relaxed = true)
+        useCase = UpdatePokemonDetailFromRemoteUseCase(
+            repo = repo,
+            imagePreloader = imagePreloader,
+        )
     }
 
     /**
-     * Test load successful (pokemonId = 6)
-     * - trigger normalUseCase invoke()
-     * - Confirmed: status should be loading
-     * - Confirmed: Pokemon with id 6 should be in the database
-     * - Confirmed: evolvesFromName of pokemon with id 6 should be empty
-     * - Confirmed: status should be success
-     * - Confirmed: evolvesFromName of pokemon with id 6 should be not empty
-     */
-    @Test
-    fun `test load successful`() = runTest {
-        val currPokemonId = 6
-        normalUseCase.invoke(currPokemonId).test {
-            assertThat(awaitItem().isLoading()).isTrue()
-
-            val prevPokemon = normalRepo.currPokemons.value.find { it.id == currPokemonId }
-            assertThat(prevPokemon).isNotNull()
-
-            assertThat(prevPokemon?.evolvesFromName.orEmpty()).isEmpty()
-
-            assertThat(awaitItem().isSuccess()).isTrue()
-
-            val nextPokemon = normalRepo.currPokemons.value.find { it.id == currPokemonId }
-            assertThat(nextPokemon?.evolvesFromName.orEmpty()).isEqualTo("pokemon5")
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    /**
-     * Test load image successful (pokemonId = 6)
-     * - Confirmed: downloaded images should be empty
-     * - trigger normalUseCase invoke()
+     * Test load successful (pokemonId = 1)
+     * - mock methods
+     * - trigger useCase invoke()
      * - Confirmed: status should be loading
      * - Confirmed: status should be success
-     * - Confirmed: downloaded image should be "https://com.sam.pokemon/image6"
+     * - Verify: repo.getRemotePokemon() should trigger exactly 1 time
+     * - Verify: repo.getRemotePokemonSpecies() should trigger exactly 1 time
+     * - Confirmed: saved images should be correct
+     * - Confirmed: saved pokemon name should be correct
      */
     @Test
-    fun `test load image successful`() = runTest {
-        val currPokemonId = 6
+    fun test_load_successful() = runTest {
+        val id = 1
+        coEvery { repo.getRemotePokemon(id) } returns Response.success(
+            mockRemotePokemonResponseForDetail
+        )
+        coEvery { repo.getRemotePokemonSpecies(id) } returns Response.success(
+            mockPokemon1SpeciesResponseForDetail
+        )
+        val captureImages = slot<List<String>>()
+        coEvery { imagePreloader.load(capture(captureImages)) } just runs
+        val capturePokemonEntity = slot<PokemonEntity>()
+        coEvery { repo.updateDetails(capture(capturePokemonEntity), any(), any()) } just runs
 
-        assertThat(imagePreloader.downloadImages).isEmpty()
-
-        normalUseCase.invoke(currPokemonId).test {
+        useCase.invoke(id).test {
             assertThat(awaitItem().isLoading()).isTrue()
-
             assertThat(awaitItem().isSuccess()).isTrue()
-
-            assertThat(imagePreloader.downloadImages[0]).isEqualTo("https://com.sam.pokemon/image6")
-
             cancelAndIgnoreRemainingEvents()
         }
+
+        coVerify(exactly = 1) { repo.getRemotePokemon(id) }
+        coVerify(exactly = 1) { repo.getRemotePokemonSpecies(id) }
+        assertThat(captureImages.captured).isEqualTo(listOf(mockPokemon1Image))
+        assertThat(capturePokemonEntity.captured.name).isEqualTo(mockPokemon1Name)
     }
 
     /**
-     * Test load failure (data not found remotely) (pokemonId = 30)
-     * - trigger errorUseCase invoke()
+     * Test load failure (data not found remotely) (pokemonId = 1)
+     * - mock methods
+     * - trigger useCase invoke()
      * - Confirmed: status should be loading
-     * - Confirmed: pokemon id 30 should not exist in the database
-     * - Confirmed: status should be error
-     * - Confirmed: pokemon id 30 should not exist in the database
+     * - Confirmed: status should be Error
+     * - Verify: imagePreloader.load should not trigger
+     * - Verify: repo.updateDetails should not trigger
      */
     @Test
-    fun `test load failure with data not found`() = runTest {
-        val currPokemonId = 30
-        normalUseCase.invoke(currPokemonId).test {
+    fun test_load_failure_with_error() = runTest {
+        val id = 1
+        val errorResponseBody = "".toResponseBody("application/json".toMediaTypeOrNull())
+        coEvery { repo.getRemotePokemon(id) } returns Response.error(404, errorResponseBody)
+        coEvery { repo.getRemotePokemonSpecies(id) } returns Response.error(404, errorResponseBody)
+        coEvery { imagePreloader.load(any()) } just runs
+        coEvery { repo.updateDetails(any(), any(), any()) } just runs
+
+        useCase.invoke(id).test {
             assertThat(awaitItem().isLoading()).isTrue()
-
-            val prevPokemon = normalRepo.currPokemons.value.find { it.id == currPokemonId }
-            assertThat(prevPokemon).isNull()
-
             assertThat(awaitItem().isError()).isTrue()
-
-            val nextPokemon = normalRepo.currPokemons.value.find { it.id == currPokemonId }
-            assertThat(nextPokemon).isNull()
-
             cancelAndIgnoreRemainingEvents()
         }
-    }
 
-    /**
-     * Test load failure (pokemonId = 6)
-     * - trigger errorUseCase invoke()
-     * - Confirmed: status should be loading
-     * - Confirmed: pokemon id 6 should not exist in the database
-     * - Confirmed: evolvesFromName of pokemon with id 6 should be empty
-     * - Confirmed: status should be error
-     * - Confirmed: evolvesFromName of pokemon with id 6 should be empty
-     */
-    @Test
-    fun `test load failure with error`() = runTest {
-        val currPokemonId = 6
-        errorUseCase.invoke(currPokemonId).test {
-            assertThat(awaitItem().isLoading()).isTrue()
-            val prevPokemon = normalRepo.currPokemons.value.find { it.id == currPokemonId }
-            assertThat(prevPokemon).isNotNull()
-            assertThat(prevPokemon?.evolvesFromName.orEmpty()).isEmpty()
-
-            assertThat(awaitItem().isError()).isTrue()
-            val nextPokemon = normalRepo.currPokemons.value.find { it.id == currPokemonId }
-            assertThat(nextPokemon?.evolvesFromName.orEmpty()).isEmpty()
-            cancelAndIgnoreRemainingEvents()
-        }
+        coVerify(exactly = 0) { imagePreloader.load(any()) }
+        coVerify(exactly = 0) { repo.updateDetails(any(), any(), any()) }
     }
 
     @After
     fun tearDown() {
-        normalRepo.clear()
-        errorRepo.clear()
-        imagePreloader.clearFakeData()
+        unmockkAll()
     }
 }

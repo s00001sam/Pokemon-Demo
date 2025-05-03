@@ -9,12 +9,11 @@ import java.io.IOException
 fun <T> Response<T>.handleResponseError() {
     when {
         !isSuccessful -> {
-            throw IOException(" ${code()} ${message()}")
+            throw IOException("${code()} ${message()}")
         }
 
         body() == null -> {
-            throw IOException(" ${code()} data empty")
+            throw IOException("${code()} data empty")
         }
     }
-
 }

@@ -26,7 +26,7 @@ class InsertCaptureUseCaseTest {
      * - Confirmed: check if calls method insertCapture in repo
      */
     @Test
-    fun `test call method insertCapture in repo`() = runTest {
+    fun test_call_method_insertCapture_in_repo() = runTest {
         val capture = CaptureEntity(
             id = 1,
             pokemonId = 1,
